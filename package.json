@@ -1,0 +1,47 @@
+{
+    "name": "typesim",
+    "version": "0.0.1",
+    "description": "Discrete event simulation with TypeScript",
+    "license": "MIT",
+    "type": "module",
+    "main": "bin/index.js",
+    "types": "dts/index.d.ts",
+    "author": {
+        "name": "Georg Hackenberg",
+        "email": "georg.hackenberg@fh-wels.at",
+        "url": "https://github.com/ghackenberg"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ghackenberg/typesim",
+        "directory": "."
+    },
+    "keywords": [
+        "typescript",
+        "des",
+        "discrete",
+        "event",
+        "simulation",
+        "simpy",
+        "simsharp",
+        "jaamsim"
+    ],
+    "engines": {
+        "node": ">=16.19.0",
+        "npm": ">=9.3.1"
+    },
+    "scripts": {
+        "clean": "rimraf bin && rimraf dts",
+        "build": "tsc",
+        "test": "",
+        "deploy": "npm run clean && npm run build && npm publish"
+    },
+    "dependencies": {
+
+    },
+    "devDependencies": {
+        "rimraf": "^4.1.2",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.5"
+    }
+}

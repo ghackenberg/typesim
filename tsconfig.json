@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "bin",
+        "declaration": true,
+        "declarationDir": "dts",
+        "listEmittedFiles": true
+    }
+}
