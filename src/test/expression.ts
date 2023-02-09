@@ -1,8 +1,8 @@
-import { And, Const, IfThenElse, Var } from "../main/index.js"
+import { And, Constant, IfThenElse, Variable } from "../main/index.js"
 
-const x = Var(true)
-const a = And(x, Const(true))
-const i = IfThenElse(a, Const("then branch"), Const("else branch"))
+const x = Variable(true)
+const a = And(x, Constant(true))
+const i = IfThenElse(a, Constant("then branch"), Constant("else branch"))
 
 x.watch(() => console.log("x has changed"))
 a.watch(() => console.log("a has changed"))

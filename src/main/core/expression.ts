@@ -30,9 +30,6 @@ class ConstantImpl<T> extends Observable<T> {
 export function Constant<T>(value: T) {
     return new ConstantImpl(value)
 }
-export function Const<T>(value: T) {
-    return new ConstantImpl(value)
-}
 
 class VariableImpl<T> extends Observable<T> {
     constructor(private value: T) {
@@ -54,11 +51,8 @@ class VariableImpl<T> extends Observable<T> {
 export function Variable<T>(value: T) {
     return new VariableImpl(value)
 }
-export function Var<T>(value: T) {
-    return new VariableImpl(value)
-}
 
-export abstract class MapImpl<S, T> extends Observable<T> {
+abstract class MapImpl<S, T> extends Observable<T> {
     private value: T
     constructor(private child: Observable<S>) {
         super()
@@ -103,7 +97,7 @@ export function Negate(child: Observable<number>) {
     return new NegateImpl(child)
 }
 
-export abstract class NaryImpl<S, T> extends Observable<T> {
+abstract class NaryImpl<S, T> extends Observable<T> {
     private value: T
     protected children: Observable<S>[]
     constructor(protected first: Observable<S>, ...children: Observable<S>[]) {
@@ -129,7 +123,7 @@ export abstract class NaryImpl<S, T> extends Observable<T> {
     protected abstract compute(): T
 }
 
-export abstract class CompareImpl<T> extends NaryImpl<T, boolean> {
+abstract class CompareImpl<T> extends NaryImpl<T, boolean> {
     constructor(first: Observable<T>, ...children: Observable<T>[]) {
         super(first, ...children)
     }
@@ -183,7 +177,7 @@ export function Greater<T>(first: Observable<number>, ...children: Observable<nu
     return new GreaterImpl(first, ...children)
 }
 
-export abstract class Reduce<T> extends NaryImpl<T, T> {
+abstract class ReduceImpl<T> extends NaryImpl<T, T> {
     constructor(first: Observable<T>, ...children: Observable<T>[]) {
         super(first, ...children)
     }
@@ -193,7 +187,7 @@ export abstract class Reduce<T> extends NaryImpl<T, T> {
     protected abstract reduce(a: T, b: T): T
 }
 
-class AndImpl extends Reduce<boolean> {
+class AndImpl extends ReduceImpl<boolean> {
     constructor(first: Observable<boolean>, ...children: Observable<boolean>[]) {
         super(first, ...children)
     }
@@ -205,7 +199,7 @@ export function And(first: Observable<boolean>, ...children: Observable<boolean>
     return new AndImpl(first, ...children)
 }
 
-class OrImpl extends Reduce<boolean> {
+class OrImpl extends ReduceImpl<boolean> {
     constructor(first: Observable<boolean>, ...children: Observable<boolean>[]) {
         super(first, ...children)
     }
@@ -217,7 +211,7 @@ export function Or(first: Observable<boolean>, ...children: Observable<boolean>[
     return new OrImpl(first, ...children)
 }
 
-class AddImpl extends Reduce<number> {
+class AddImpl extends ReduceImpl<number> {
     constructor(first: Observable<number>, ...children: Observable<number>[]) {
         super(first, ...children)
     }
@@ -229,7 +223,7 @@ export function Add(first: Observable<number>, ...children: Observable<number>[]
     return new AddImpl(first, ...children)
 }
 
-class SubstractImpl extends Reduce<number> {
+class SubstractImpl extends ReduceImpl<number> {
     constructor(first: Observable<number>, ...children: Observable<number>[]) {
         super(first, ...children)
     }
@@ -241,7 +235,7 @@ export function Substract(first: Observable<number>, ...children: Observable<num
     return new SubstractImpl(first, ...children)
 }
 
-class MultiplyImpl extends Reduce<number> {
+class MultiplyImpl extends ReduceImpl<number> {
     constructor(first: Observable<number>, ...children: Observable<number>[]) {
         super(first, ...children)
     }
@@ -253,7 +247,7 @@ export function Multiply(first: Observable<number>, ...children: Observable<numb
     return new MultiplyImpl(first, ...children)
 }
 
-class DivideImpl extends Reduce<number> {
+class DivideImpl extends ReduceImpl<number> {
     constructor(first: Observable<number>, ...children: Observable<number>[]) {
         super(first, ...children)
     }
