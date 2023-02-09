@@ -13,7 +13,4 @@ export class Entity extends Component<EntityI, EntityO> {
     override copy() {
         return new Entity(this.model, this.inputs)
     }
-    override update() {
-        super.update()
-    }
 }

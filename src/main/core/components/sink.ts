@@ -19,11 +19,8 @@ export class Sink extends FlowComponent<SinkI, SinkO> {
     override copy() {
         return new Sink(this.model, this.inputs)
     }
-    override update() {
-        super.update()
-    }
 
-    override flow(component: Component<any, any>) {
+    override send(component: Component<any, any>) {
         this.outputs.object = component
         this.outputs.count += 1
 

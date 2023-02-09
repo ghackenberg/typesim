@@ -26,9 +26,6 @@ export class Source extends Component<SourceI, SourceO> {
     override copy() {
         return new Source(this.model, this.inputs)
     }
-    override update() {
-        super.update()
-    }
 
     private process() {
         const prototype = read(this.inputs.prototype)
@@ -38,7 +35,7 @@ export class Source extends Component<SourceI, SourceO> {
         console.log(this.outputs.name, "produces", count, "objects")
 
         for (let index = 0; index < count; index++) {
-            next.flow(prototype.clone())
+            next.send(prototype.clone())
         }
 
         this.outputs.count += count

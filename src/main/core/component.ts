@@ -19,8 +19,8 @@ export abstract class Component<I, O> {
 
     clone() {
         const copy = this.copy()
-        this.model.track(copy)
         copy.reset()
+        this.model.track(copy)
         return copy
     }
 
