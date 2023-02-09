@@ -33,7 +33,10 @@
     "scripts": {
         "clean": "rimraf bin && rimraf dts",
         "build": "tsc",
-        "test": "npm run clean && npm run build && node bin/test/simple.js",
+        "test": "npm run clean && npm run build && npm run test-all",
+        "test-all": "npm run test-simple && npm run test-expression",
+        "test-simple": "node bin/test/simple.js",
+        "test-expression": "node bin/test/expression.js",
         "deploy": "npm run clean && npm run build && npm publish"
     },
     "devDependencies": {

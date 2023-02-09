@@ -1,3 +1,4 @@
+export * from "./core/expression.js"
 export * from "./core/vector.js"
 export * from "./core/event.js"
 export * from "./core/model.js"
