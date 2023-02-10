@@ -1,4 +1,3 @@
-import { Event } from "./event.js"
 import { Model } from "./model.js"
 
 interface ComponentI {
