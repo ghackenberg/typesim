@@ -1,52 +1,46 @@
 import { Component } from "../component.js"
-import { Event } from "../event.js"
-import { Input, read } from "../input.js"
 import { FlowComponent } from "./flow.js"
 import { Queue } from "./queue.js"
 
-type ServerI = {
-    queue: Input<Queue>
-    serviceTime: Input<number>
-    next: Input<FlowComponent<any, any>>
+interface ServerI {
+    get queue(): Queue
+    get serviceTime(): number
+    get next(): FlowComponent<any, any>
 }
-type ServerO = {
+interface ServerO {
     object: Component<any, any>
+    departureTime: number
     count: number
 }
 
 export class Server extends Component<ServerI, ServerO> {
     override reset() {
         this.outputs = {
-            name: read(this.inputs.name),
+            name: this.inputs.name,
             object: null,
+            departureTime: 0,
             count: 0
         }
     }
-    override copy() {
-        return new Server(this.model, this.inputs)
-    }
-    override update() {
-        super.update()
+    protected override process() {
+        if (this.outputs.object != null && this.outputs.departureTime == this.model.time) {
+            const next = this.inputs.next
 
+            next.send(this.outputs.object)
+
+            this.outputs.object = null
+        }
         if (this.outputs.object == null) {
-            const queue = read(this.inputs.queue)
-
+            const queue = this.inputs.queue
+    
             if (queue.outputs.length > 0) {
-                console.log(this.outputs.name, "consumes 1 object")
-
-                const next = read(this.inputs.next)
+                const time = this.model.time + this.inputs.serviceTime
 
                 this.outputs.object = queue.take()
+                this.outputs.departureTime = time
                 this.outputs.count += 1
-        
-                const time = this.model.now() + read(this.inputs.serviceTime)
-
-                this.model.schedule(new Event(time, () => {
-                    next.send(this.outputs.object)
-
-                    this.outputs.object = null
-                    this.update()
-                }))
+    
+                this.model.scheduleUpdate(time, this)
             }
         }
     }

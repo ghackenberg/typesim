@@ -1,34 +1,130 @@
-import { Input, read } from "./input.js"
+import { Event } from "./event.js"
 import { Model } from "./model.js"
 
-type ComponentI = {
-    name: Input<string>
+interface ComponentI {
+    get name(): string
 }
-type ComponentO = {
+interface ComponentO {
     name: string
 }
 
-export abstract class Component<I, O> {    
-    inputs: I & ComponentI
-    outputs: O & ComponentO
+export enum ComponentType {
+    STATIC, DYNAMIC
+}
+export abstract class Component<I, O> {
+
+    protected static CONTEXT: Component<any, any>[] = []
+
+    private _type: ComponentType
+    private _model: Model
+    private _inputs: I & ComponentI
+    private _outputs: O & ComponentO
+
+    private tracking = new Map<Component<any, any>, string[]>()
+    private trackedBy = new Map<string, Component<any, any>[]>()
+
+    get type() {
+        return this._type
+    }
+    private set type(value: ComponentType) {
+        this._type = value
+    }
+
+    get model() {
+        return this._model
+    }
+    private set model(value: Model) {
+        this._model = value
+    }
+
+    get inputs() {
+        return this._inputs
+    }
+    private set inputs(value: I & ComponentI) {
+        this._inputs = value
+    }
+
+    get outputs() {
+        return this._outputs
+    }
+    protected set outputs(value: O & ComponentO) {
+        const copy = { ...value }
+        for (const p in copy) {
+            Object.defineProperty(copy, p, {
+                get: () => {
+                    const context = Component.CONTEXT[Component.CONTEXT.length - 1]
+                    if (context != this) {
+                        if (!context.tracking.has(this)) {
+                            context.tracking.set(this, [])
+                        }
+                        if (!this.trackedBy.has(p)) {
+                            this.trackedBy.set(p, [])
+                        }
+                        if (context.tracking.get(this).indexOf(p) == -1) {
+                            console.debug(Component.CONTEXT.map(comp => comp.inputs.name), `tracks ${this.inputs.name}.${p}`)
+                            context.tracking.get(this).push(p)
+                        }
+                        if (this.trackedBy.get(p).indexOf(context) == -1) {
+                            this.trackedBy.get(p).push(context)
+                        }
+                    }
+                    return value[p]
+                },
+                set: temp => {
+                    const context = Component.CONTEXT[Component.CONTEXT.length - 1]
+                    console.log(Component.CONTEXT.map(comp => comp.inputs.name), `updates ${this.inputs.name}.${p}=${temp}`)
+                    if (context != this) {
+                        throw "Should not happen!"
+                    }
+                    if (this.trackedBy.has(p)) {
+                        for (const comp of this.trackedBy.get(p)) {
+                            if (comp != this && Component.CONTEXT.indexOf(comp) == -1) {
+                                console.log(`... causes ${comp.inputs.name} update`)
+                                this.model.scheduleUpdate(this.model.time, comp)
+                            }
+                        }
+                    }
+                    value[p] = temp
+                }
+            })
+        }
+        this._outputs = copy
+    }
     
-    constructor(public model: Model, inputs: I & ComponentI) {
-        this.model.add(this)
+    constructor(model: Model, inputs: I & ComponentI) {
+        this.model = model
         this.inputs = inputs
+        if (model.simulation) {
+            this.type = ComponentType.DYNAMIC
+            model.addDynamicComponent(this)
+        } else {
+            this.type = ComponentType.STATIC
+            model.addStaticComponent(this)
+        }
     }
-
-    clone() {
-        const copy = this.copy()
-        copy.reset()
-        this.model.track(copy)
-        return copy
-    }
-
-    protected abstract copy(): Component<I, O>
     
     abstract reset()
 
     update() {
-        this.outputs.name = read(this.inputs.name)
+        // Update tracking state
+        if (Component.CONTEXT.indexOf(this) == -1) {
+            for (const [comp, props] of this.tracking)  {
+                for (const prop of props) {
+                    comp.trackedBy.get(prop).splice(comp.trackedBy.get(prop).indexOf(this), 1)
+                }
+            }
+            this.tracking.clear()
+        }
+        // Perform update
+        Component.CONTEXT.push(this)
+        console.debug(Component.CONTEXT.map(comp => comp.inputs.name), "update start")
+        this.process()
+        console.debug(Component.CONTEXT.map(comp => comp.inputs.name), "update end")
+        Component.CONTEXT.pop()
     }
+
+    protected process() {
+
+    }
+    
 }

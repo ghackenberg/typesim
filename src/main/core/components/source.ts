@@ -1,46 +1,46 @@
 import { Component } from "../component.js"
-import { Event } from "../event.js"
-import { Input, read } from "../input.js"
 import { FlowComponent } from "./flow.js"
 
-type SourceI = {
-    prototype: Input<Component<any, any>>
-    firstArrivalTime: Input<number>
-    interArrivalTime: Input<number>
-    count: Input<number>
-    next: Input<FlowComponent<any, any>>
+interface SourceI {
+    get factory(): (count: number) => Component<any, any>
+    get firstArrivalTime(): number
+    get interArrivalTime(): number
+    get count(): number
+    get next(): FlowComponent<any, any>
 }
-type SourceO = {
+interface SourceO {
+    object: Component<any, any>
     count: number
 }
 
 export class Source extends Component<SourceI, SourceO> {
     override reset() {
         this.outputs = {
-            name: read(this.inputs.name),
+            name: this.inputs.name,
+            object: null,
             count: 0
         }
-        const time = this.model.now() + read(this.inputs.firstArrivalTime)
-        this.model.schedule(new Event(time, () => this.process()))
+        const time = this.model.time + this.inputs.firstArrivalTime
+        this.model.scheduleUpdate(time, this)
     }
-    override copy() {
-        return new Source(this.model, this.inputs)
-    }
-
-    private process() {
-        const prototype = read(this.inputs.prototype)
-        const count = read(this.inputs.count)
-        const next = read(this.inputs.next)
-
-        console.log(this.outputs.name, "produces", count, "objects")
+    protected override process() {
+        const factory = this.inputs.factory
+        const count = this.inputs.count
+        const next = this.inputs.next
 
         for (let index = 0; index < count; index++) {
-            next.send(prototype.clone())
+            const object = factory(this.outputs.count + index)
+            
+            object.reset()
+            object.update()
+            
+            this.outputs.object = object
+            this.outputs.count++
+
+            next.send(object)
         }
 
-        this.outputs.count += count
-
-        const time = this.model.now() + read(this.inputs.interArrivalTime)
-        this.model.schedule(new Event(time, () => this.process()))
+        const time = this.model.time + this.inputs.interArrivalTime
+        this.model.scheduleUpdate(time, this)
     }
 }

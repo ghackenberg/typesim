@@ -1,4 +1,3 @@
-export * from "./core/expression.js"
 export * from "./core/vector.js"
 export * from "./core/event.js"
 export * from "./core/model.js"
@@ -9,3 +8,5 @@ export * from "./core/components/source.js"
 export * from "./core/components/queue.js"
 export * from "./core/components/server.js"
 export * from "./core/components/sink.js"
+
+export * from "./misc/expression.js"
