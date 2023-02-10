@@ -2,7 +2,7 @@ import { Component } from "../component.js"
 import { FlowComponent } from "./flow.js"
 
 interface SourceI {
-    get factory(): (count: number) => Component<any, any>
+    get factory(): () => Component<any, any>
     get firstArrivalTime(): number
     get interArrivalTime(): number
     get count(): number
@@ -29,7 +29,7 @@ export class Source extends Component<SourceI, SourceO> {
         const next = this.inputs.next
 
         for (let index = 0; index < count; index++) {
-            const object = factory(this.outputs.count + index)
+            const object = factory()
             
             object.reset()
             object.update()

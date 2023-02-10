@@ -40,7 +40,10 @@ export abstract class Component<I, O> {
     get inputs() {
         return this._inputs
     }
-    private set inputs(value: I & ComponentI) {
+    set inputs(value: I & ComponentI) {
+        if (this._inputs) {
+            throw "Cannot set inputs twice!"
+        }
         this._inputs = value
     }
 
@@ -74,7 +77,7 @@ export abstract class Component<I, O> {
                     const context = Component.CONTEXT[Component.CONTEXT.length - 1]
                     console.log(Component.CONTEXT.map(comp => comp.inputs.name), `updates ${this.inputs.name}.${p}=${temp}`)
                     if (context != this) {
-                        throw "Should not happen!"
+                        throw "Component outputs must not be writted from other components! Context tracking might not be correct..."
                     }
                     if (this.trackedBy.has(p)) {
                         for (const comp of this.trackedBy.get(p)) {
@@ -91,7 +94,7 @@ export abstract class Component<I, O> {
         this._outputs = copy
     }
     
-    constructor(model: Model, inputs: I & ComponentI) {
+    constructor(model: Model, inputs: I & ComponentI = undefined) {
         this.model = model
         this.inputs = inputs
         if (model.simulation) {
