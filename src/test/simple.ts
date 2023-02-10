@@ -16,9 +16,9 @@ async function run() {
         factory: () => new Entity(model, {
             name: `Entity_${source.outputs.count}`
         }),
-        count: Math.random() * 10,
+        get count() { return Math.random() * 10 },
         firstArrivalTime: 0,
-        interArrivalTime: Math.random() * 20,
+        get interArrivalTime() { return Math.random() * 20 },
         next: queue
     }
     queue.inputs = {
@@ -27,7 +27,7 @@ async function run() {
     server.inputs = {
         name: "Server",
         queue: queue,
-        serviceTime: Math.random() * 30,
+        get serviceTime () { return Math.random() * 30 },
         next: branch
     }
     branch.inputs = {
@@ -57,7 +57,7 @@ async function run() {
 
     console.log("Run 3")
     
-    console.log(await model.simulate(1000, 0.1), "ms")
+    console.log(await model.simulate(1000, 0.5), "ms")
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
