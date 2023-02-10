@@ -19,6 +19,7 @@ export class Model {
     }
 
     scheduleUpdate(time: number, component: Component<any, any>) {
+        // TODO improve performance!
         for (const event of this.events) {
             if (event.time == time && event.component == component) {
                 return
