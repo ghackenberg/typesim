@@ -47,7 +47,7 @@ export class Model {
         this._simulation = value
     }
     
-    simulate(until = Number.MAX_VALUE) {
+    async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
         if (this.simulation) {
             throw "Simulation already running!"
         }
@@ -65,14 +65,62 @@ export class Model {
         for (const component of this.staticComponents) {
             component.reset()
         }
-
         // Update all static components
         for (const component of this.staticComponents) {
             component.update()
         }
 
+        // Execute loop
+        if (factor == Number.MAX_VALUE) {
+            this.loop(until)
+        } else {
+            await this.loopAsync(until, factor)
+        }
+
+        // Reset model status
+        this.simulation = false
+
+        console.debug("Simulation end")
+    }
+
+    private loop(until: number) {
+        try {
+            while (true) {
+                this.step(until)
+            }
+        } catch {
+            return
+        }
+    }
+
+    private async loopAsync(until: number, factor: number) {
+        const startReal = Date.now()
+        const startSim = this.time
+        return new Promise<void>((resolve, _reject) => {
+            const next = () => {
+                try {
+                    if (this.events.length > 0) {
+                        this.events.sort((a, b) => a.time - b.time)
+                        const deltaReal = Date.now() - startReal
+                        const deltaSim = (this.events[0].time - startSim) / factor
+                        if (deltaReal >= deltaSim) {
+                            this.step(until)
+                            setTimeout(next, 0)
+                        } else {
+                            setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                        }
+                    }
+                } catch {
+                    resolve()
+                }
+            }
+            next()
+        })
+    }
+
+    private step(until: number) {
         // Process events until no more events or time horizon reached
-        while (this.events.length > 0) {
+        if (this.events.length > 0) {
             // Sort events by time
             this.events.sort((a, b) => a.time - b.time)
             // Take next event
@@ -87,23 +135,15 @@ export class Model {
                 event.component.update()
                 console.debug()
             } else {
-                break
+                this.time = until
+                this.progress = 1
+
+                console.debug('Time:', this.time)
+                console.debug()
+
+                throw 0
             }
         }
-
-        // Check if simultion ended before time horizon
-        if (this.time < until) {
-            this.time = until
-            this.progress = 1
-
-            console.debug('Time:', this.time)
-            console.debug()
-        }
-
-        // Reset model status
-        this.simulation = false
-
-        console.debug("Simulation end")
     }
     
 }

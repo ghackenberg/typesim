@@ -37,3 +37,5 @@ sink.inputs = {
 }
 
 model.simulate(1000)
+
+model.simulate(1000, 0.05)
