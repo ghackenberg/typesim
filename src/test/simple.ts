@@ -1,4 +1,4 @@
-import { Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
+import { Branch, Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
 
 const model = new Model()
 
@@ -18,11 +18,16 @@ const source = new Source(model, {
 const sink = new Sink(model, {
     name: "Sink"
 })
+const branch = new Branch(model, {
+    name: "Branch",
+    next: [sink],
+    choice: 0
+})
 const server = new Server(model, {
     name: "Server",
     queue: queue,
     serviceTime: Math.random() * 30,
-    next: sink
+    next: branch
 })
 
 model.simulate(1000)

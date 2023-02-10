@@ -3,7 +3,7 @@ import { FlowComponent } from "./flow.js"
 
 interface QueueI { }
 interface QueueO {
-    objects: Component<any, any>[],
+    objects: Component<any, any>[]
     length: number
 }
 

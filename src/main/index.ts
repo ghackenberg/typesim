@@ -7,6 +7,7 @@ export * from "./core/components/entity.js"
 export * from "./core/components/source.js"
 export * from "./core/components/queue.js"
 export * from "./core/components/server.js"
+export * from "./core/components/branch.js"
 export * from "./core/components/sink.js"
 
 export * from "./misc/expression.js"
