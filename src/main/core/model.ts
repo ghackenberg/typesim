@@ -5,7 +5,7 @@ export class Model {
 
     private staticComponents: Component<any, any>[] = []
     private dynamicComponents: Component<any, any>[]
-    
+
     private events: Event[]
     private _time: number
     private _progress: number
@@ -25,6 +25,8 @@ export class Model {
             }
         }
         this.events.push(new Event(time, component))
+        // Sort events by time
+        this.events.sort((a, b) => a.time - b.time)
     }
 
     get time() {
@@ -52,6 +54,8 @@ export class Model {
         if (this.simulation) {
             throw "Simulation already running!"
         }
+
+        const start = Date.now()
 
         console.debug("Simulation start")
 
@@ -82,6 +86,8 @@ export class Model {
         this.simulation = false
 
         console.debug("Simulation end")
+
+        return Date.now() - start
     }
 
     private loopSync(until: number) {
@@ -100,20 +106,20 @@ export class Model {
         return new Promise<void>((resolve, _reject) => {
             const next = () => {
                 try {
-                    if (this.events.length > 0) {
-                        this.events.sort((a, b) => a.time - b.time)
-                        const deltaReal = Date.now() - startReal
+                    const deltaReal = Date.now() - startReal
+                    while (this.events.length > 0) {
                         const deltaSim = (this.events[0].time - startSim) / factor
                         if (deltaReal >= deltaSim) {
                             this.step(until)
-                            setTimeout(next, 0)
                         } else {
                             setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                            return
                         }
                     }
                 } catch {
-                    resolve()
+
                 }
+                resolve()
             }
             next()
         })
@@ -122,8 +128,6 @@ export class Model {
     private step(until: number) {
         // Process events until no more events or time horizon reached
         if (this.events.length > 0) {
-            // Sort events by time
-            this.events.sort((a, b) => a.time - b.time)
             // Take next event
             const event = this.events.shift()
             // Check if event is within time horizon
