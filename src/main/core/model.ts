@@ -5,6 +5,7 @@ export class Model {
 
     private staticComponents: Component<any, any>[] = []
     private dynamicComponents: Component<any, any>[]
+    
     private events: Event[]
     private _time: number
     private _progress: number
