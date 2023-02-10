@@ -72,7 +72,7 @@ export class Model {
 
         // Execute loop
         if (factor == Number.MAX_VALUE) {
-            this.loop(until)
+            this.loopSync(until)
         } else {
             await this.loopAsync(until, factor)
         }
@@ -83,7 +83,7 @@ export class Model {
         console.debug("Simulation end")
     }
 
-    private loop(until: number) {
+    private loopSync(until: number) {
         try {
             while (true) {
                 this.step(until)
