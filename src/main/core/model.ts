@@ -172,8 +172,7 @@ export class Model {
                             if (deltaReal >= deltaSim) {
                                 this.step()
                             } else {
-                                setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
-                                return
+                                return setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
                             }
                         } else {
                             break
@@ -189,7 +188,6 @@ export class Model {
                     resolve()
                 } catch(error) {
                     reject(error)
-                    return
                 }
             }
             next()
