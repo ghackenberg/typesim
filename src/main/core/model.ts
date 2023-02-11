@@ -144,17 +144,16 @@ export class Model {
         while (this.events.length > 0) {
             if (this.events[0].time <= until) {
                 this.step()
-                continue
             } else {
-                if (this.time != until) {
-                    // Update clock
-                    this.time = until
-                                
-                    console.debug('Time:', this.time)
-                    console.debug()
-                }
-                return
+                break
             }
+        }
+        if (this.time != until) {
+            // Update clock
+            this.time = until
+                        
+            console.debug('Time:', this.time)
+            console.debug()
         }
     }
 
@@ -172,23 +171,22 @@ export class Model {
                             const deltaSim = (nowSim - startSim) / factor
                             if (deltaReal >= deltaSim) {
                                 this.step()
-                                continue
                             } else {
                                 setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
                                 return
                             }
                         } else {
-                            if (this.time != until) {
-                                // Update clock
-                                this.time = until
-                                
-                                console.debug('Time:', this.time)
-                                console.debug()
-                            }
-                            resolve()
-                            return
+                            break
                         }
                     }
+                    if (this.time != until) {
+                        // Update clock
+                        this.time = until
+                        
+                        console.debug('Time:', this.time)
+                        console.debug()
+                    }
+                    resolve()
                 } catch(error) {
                     reject(error)
                     return
