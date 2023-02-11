@@ -17,6 +17,7 @@ export class Model {
     private staticComponents: Component<any, any>[] = []
     private dynamicComponents: Component<any, any>[]
 
+    private updates: Map<Component<any, any>, number[]>
     private events: Event[]
     private _time: number
     private _progress: number
@@ -34,16 +35,47 @@ export class Model {
         this.dynamicComponents.push(component)
     }
 
-    scheduleUpdate(time: number, component: Component<any, any>) {
-        // TODO improve performance!
-        for (const event of this.events) {
-            if (event.time == time && event.component == component) {
-                return
+    private searchBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
+        let lower = 0
+        let upper = array.length - 1
+        while (lower < upper) {
+            let middle = Math.floor((lower + upper) / 2)
+            let delta = comparator(array[middle], value)
+            if (delta < 0) {
+                lower = middle + 1
+            } else if (delta > 0) {
+                upper = middle - 1
+            } else {
+                return lower
             }
         }
-        this.events.push(new Event(time, component))
-        // Sort events by time
-        this.events.sort((a, b) => a.time - b.time)
+        return lower
+    }
+    private hasBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
+        if (array.length == 0) {
+            return false
+        } else {
+            const index = this.searchBinary(array, comparator, value)
+            return comparator(array[index], value) == 0
+        }
+    }
+    private insertBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
+        const index = this.searchBinary(array, comparator, value)
+        array.splice(index, 0, value)
+    }
+
+    scheduleUpdate(time: number, component: Component<any, any>) {
+        // Check updates
+        if (!this.updates.has(component)) {
+            this.updates.set(component, [])
+        }
+        if (this.hasBinary(this.updates.get(component), (a, b) => a - b, time)) {
+            return
+        }
+        // Update updates
+        this.insertBinary(this.updates.get(component), (a, b) => a - b, time)
+        // Update events
+        this.insertBinary(this.events, (a, b) => a.time - b.time, new Event(time, component))
     }
 
     get time() {
@@ -78,6 +110,7 @@ export class Model {
 
         // Initialize model status
         this.dynamicComponents = []
+        this.updates = new Map<Component<any, any>, number[]>()
         this.events = []
         this.time = 0
         this.progress = 0
