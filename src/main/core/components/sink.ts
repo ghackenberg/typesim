@@ -8,6 +8,9 @@ interface SinkO {
 }
 
 export class Sink extends FlowComponent<SinkI, SinkO> {
+    override check() {
+        return []
+    }
     override reset() {
         this.outputs = {
             name: this.inputs.name,

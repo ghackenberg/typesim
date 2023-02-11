@@ -14,6 +14,9 @@ interface ServerO {
 }
 
 export class Server extends Component<ServerI, ServerO> {
+    override check() {
+        return []
+    }
     override reset() {
         this.outputs = {
             name: this.inputs.name,

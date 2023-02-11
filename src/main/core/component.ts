@@ -108,6 +108,8 @@ export abstract class Component<I, O> {
         }
         this._outputs = copy
     }
+
+    abstract check(): string[]
     
     abstract reset()
 

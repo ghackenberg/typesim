@@ -14,6 +14,9 @@ interface SourceO {
 }
 
 export class Source extends Component<SourceI, SourceO> {
+    override check() {
+        return []
+    }
     override reset() {
         this.outputs = {
             name: this.inputs.name,
@@ -31,6 +34,7 @@ export class Source extends Component<SourceI, SourceO> {
         for (let index = 0; index < count; index++) {
             const object = factory()
             
+            object.check()
             object.reset()
             object.update()
             

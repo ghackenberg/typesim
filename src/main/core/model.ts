@@ -20,7 +20,6 @@ export class Model {
     private updates: Map<Component<any, any>, number[]>
     private events: Event[]
     private _time: number
-    private _progress: number
     private _simulation: boolean = false
 
     constructor() {
@@ -85,13 +84,6 @@ export class Model {
         this._time = value
     }
 
-    get progress() {
-        return this._progress
-    }
-    private set progress(value: number) {
-        this._progress = value
-    }
-
     get simulation() {
         return this._simulation
     }
@@ -104,6 +96,15 @@ export class Model {
             throw "Simulation already running!"
         }
 
+        // Check all components
+        let issues: string[] = []
+        for (const component of this.staticComponents) {
+            issues = issues.concat(component.check())
+        }
+        if (issues.length > 0) {
+            throw issues
+        }
+
         const start = Date.now()
 
         console.debug("Simulation start")
@@ -113,7 +114,6 @@ export class Model {
         this.updates = new Map<Component<any, any>, number[]>()
         this.events = []
         this.time = 0
-        this.progress = 0
         this.simulation = true
         
         // Reset all static components
@@ -141,64 +141,76 @@ export class Model {
     }
 
     private loopSync(until: number) {
-        try {
-            while (true) {
-                this.step(until)
+        while (this.events.length > 0) {
+            if (this.events[0].time <= until) {
+                this.step()
+                continue
+            } else {
+                if (this.time != until) {
+                    // Update clock
+                    this.time = until
+                                
+                    console.debug('Time:', this.time)
+                    console.debug()
+                }
+                return
             }
-        } catch {
-            return
         }
     }
 
     private async loopAsync(until: number, factor: number) {
         const startReal = Date.now()
         const startSim = this.time
-        return new Promise<void>((resolve, _reject) => {
+        return new Promise<void>((resolve, reject) => {
             const next = () => {
                 try {
-                    const deltaReal = Date.now() - startReal
+                    const nowReal = Date.now()
+                    const deltaReal = nowReal - startReal
                     while (this.events.length > 0) {
-                        const deltaSim = (this.events[0].time - startSim) / factor
-                        if (deltaReal >= deltaSim) {
-                            this.step(until)
+                        const nowSim = this.events[0].time
+                        if (nowSim <= until) {
+                            const deltaSim = (nowSim - startSim) / factor
+                            if (deltaReal >= deltaSim) {
+                                this.step()
+                                continue
+                            } else {
+                                setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                                return
+                            }
                         } else {
-                            setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                            if (this.time != until) {
+                                // Update clock
+                                this.time = until
+                                
+                                console.debug('Time:', this.time)
+                                console.debug()
+                            }
+                            resolve()
                             return
                         }
                     }
-                } catch {
-
+                } catch(error) {
+                    reject(error)
+                    return
                 }
-                resolve()
             }
             next()
         })
     }
 
-    private step(until: number) {
-        // Process events until no more events or time horizon reached
-        if (this.events.length > 0) {
-            // Take next event
-            const event = this.events.shift()
-            // Check if event is within time horizon
-            if (event.time < until) {
-                this.time = event.time
-                this.progress = this.time / until
+    private step() {
+        // Take next event
+        const event = this.events.shift()
+        
+        // Update clock
+        this.time = event.time
 
-                console.debug('Time:', this.time)
-                console.debug()
-                event.component.update()
-                console.debug()
-            } else {
-                this.time = until
-                this.progress = 1
+        console.debug('Time:', this.time)
+        console.debug()
 
-                console.debug('Time:', this.time)
-                console.debug()
-
-                throw 0
-            }
-        }
+        // Update component
+        event.component.update()
+        console.debug()
     }
     
 }

@@ -11,6 +11,9 @@ interface BranchO {
 }
 
 export class Branch extends FlowComponent<BranchI, BranchO> {
+    override check() {
+        return []
+    }
     override reset() {
         this.outputs = {
             name: this.inputs.name,

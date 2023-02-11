@@ -8,6 +8,9 @@ interface QueueO {
 }
 
 export class Queue extends FlowComponent<QueueI, QueueO> {
+    override check() {
+        return []
+    }
     override reset() {
         this.outputs = {
             name: this.inputs.name,
