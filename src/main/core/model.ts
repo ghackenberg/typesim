@@ -172,7 +172,8 @@ export class Model {
                             if (deltaReal >= deltaSim) {
                                 this.step()
                             } else {
-                                return setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                                setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                                this.render()
                             }
                         } else {
                             break
@@ -185,6 +186,7 @@ export class Model {
                         console.debug('Time:', this.time)
                         console.debug()
                     }
+                    this.render()
                     resolve()
                 } catch(error) {
                     reject(error)
@@ -207,6 +209,15 @@ export class Model {
         // Update component
         event.component.update()
         console.debug()
+    }
+
+    private render() {
+        for (const component of this.staticComponents) {
+            component.render()
+        }
+        for (const component of this.dynamicComponents) {
+            component.render()
+        }
     }
     
 }

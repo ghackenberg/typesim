@@ -131,6 +131,10 @@ export abstract class Component<I, O> {
         Component.CONTEXT.pop()
     }
 
+    render() {
+        // TODO implement render functionality
+    }
+
     protected process() {
 
     }
