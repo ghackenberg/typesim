@@ -1,3 +1,4 @@
+import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
 import { Component } from "./component.js"
 import { Event } from "./event.js"
 
@@ -21,6 +22,11 @@ export class Model {
     private events: Event[]
     private _time: number
     private _simulation: boolean = false
+    private _visualization: boolean = false
+
+    private renderer: WebGLRenderer
+    private camera: PerspectiveCamera
+    private scene: Scene
 
     constructor() {
         Model._INSTANCES.push(this)
@@ -90,6 +96,13 @@ export class Model {
     private set simulation(value: boolean) {
         this._simulation = value
     }
+
+    get visualization() {
+        return this._visualization
+    }
+    private set visualization(value: boolean) {
+        this._visualization = value
+    }
     
     async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
         if (this.simulation) {
@@ -115,6 +128,13 @@ export class Model {
         this.events = []
         this.time = 0
         this.simulation = true
+        this.visualization = factor != Number.MAX_VALUE
+
+        if (this.visualization) {
+            this.renderer = new WebGLRenderer()
+            this.camera = new PerspectiveCamera()
+            this.scene = new Scene()
+        }
         
         // Reset all static components
         for (const component of this.staticComponents) {
@@ -212,12 +232,7 @@ export class Model {
     }
 
     private render() {
-        for (const component of this.staticComponents) {
-            component.render()
-        }
-        for (const component of this.dynamicComponents) {
-            component.render()
-        }
+        this.renderer.render(this.scene, this.camera)
     }
     
 }
