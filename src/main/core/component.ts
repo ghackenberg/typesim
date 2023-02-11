@@ -22,7 +22,7 @@ export abstract class Component<I, O> {
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
     
-    constructor(model: Model = Model.instance, inputs: I & ComponentI = undefined) {
+    constructor(model: Model = Model.INSTANCE, inputs: I & ComponentI = undefined) {
         this.model = model
         this.inputs = inputs
         if (model.simulation) {

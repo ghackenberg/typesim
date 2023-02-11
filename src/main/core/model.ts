@@ -3,19 +3,15 @@ import { Event } from "./event.js"
 
 export class Model {
 
-    private static _instances: Model[] = []
-    private static _instance: Model
+    private static _INSTANCES: Model[] = []
+    private static _INSTANCE: Model
 
-    public static get instances() {
-        return Model._instances
+    public static get INSTANCES() {
+        return Model._INSTANCES
     }
 
-    public static get instance() {
-        return Model._instance
-    }
-    private static set instance(value: Model) {
-        Model.instances.push(value)
-        Model._instance = value
+    public static get INSTANCE() {
+        return Model._INSTANCE
     }
 
     private staticComponents: Component<any, any>[] = []
@@ -27,7 +23,8 @@ export class Model {
     private _simulation: boolean = false
 
     constructor() {
-        Model.instance = this
+        Model._INSTANCES.push(this)
+        Model._INSTANCE = this
     }
 
     addStaticComponent(component: Component<any, any>) {
