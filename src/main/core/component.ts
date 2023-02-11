@@ -1,10 +1,18 @@
+import { Object3D } from "three"
 import { Model } from "./model.js"
+import { Vector } from "./vector.js"
 
 interface ComponentI {
     get name(): string
+    get position(): Vector
+    get orientation(): Vector
+    get scale(): Vector
 }
 interface ComponentO {
     name: string
+    position: Vector
+    orientation: Vector
+    scale: Vector
 }
 
 export enum ComponentType {
@@ -21,6 +29,8 @@ export abstract class Component<I, O> {
 
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
+
+    private _object: Object3D
     
     constructor(model: Model = Model.INSTANCE, inputs: I & ComponentI = undefined) {
         this.model = model
@@ -109,6 +119,14 @@ export abstract class Component<I, O> {
         this._outputs = copy
     }
 
+    protected get object() {
+        return this._object
+    }
+    protected set object(value: Object3D) {
+        this._object = value
+        this.model.scene.add(value)
+    }
+
     abstract check(): string[]
     
     abstract reset()
@@ -133,6 +151,17 @@ export abstract class Component<I, O> {
 
     protected process() {
 
+    }
+
+    move(x: number, y: number, z: number) {
+        Component.CONTEXT.push(this)
+        this.outputs.position = new Vector(x, y, z)
+        if (this.model.visualization) {
+            this.object.position.x = x
+            this.object.position.y = y
+            this.object.position.z = z
+        }
+        Component.CONTEXT.pop()
     }
     
 }

@@ -1,4 +1,4 @@
-import { Branch, Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
+import { Branch, Entity, Model, Queue, Server, Sink, Source, Vector } from '../main/index.js'
 
 async function run() {
     console.debug = () => {}
@@ -13,9 +13,15 @@ async function run() {
     
     source.inputs = {
         name: "Source",
+        position: new Vector(0, 0, 0),
+        orientation: new Vector(0, 0, 0),
+        scale: new Vector(1, 1, 1),
         factory() {
             return new Entity(model, {
-                name: `Entity_${source.outputs.count}`
+                name: `Entity_${source.outputs.count}`,
+                position: new Vector(0, 0, 0),
+                orientation: new Vector(0, 0, 0),
+                scale: new Vector(1, 1, 1)
             })
         },
         get count() {
@@ -28,10 +34,16 @@ async function run() {
         next: queue
     }
     queue.inputs = {
-        name: "Queue"
+        name: "Queue",
+        position: new Vector(0, 0, 0),
+        orientation: new Vector(0, 0, 0),
+        scale: new Vector(1, 1, 1)
     }
     server.inputs = {
         name: "Server",
+        position: new Vector(0, 0, 0),
+        orientation: new Vector(0, 0, 0),
+        scale: new Vector(1, 1, 1),
         queue: queue,
         get serviceTime() {
             return Math.random() * 30
@@ -40,11 +52,17 @@ async function run() {
     }
     branch.inputs = {
         name: "Branch",
+        position: new Vector(0, 0, 0),
+        orientation: new Vector(0, 0, 0),
+        scale: new Vector(1, 1, 1),
         next: [sink],
         choice: 0
     }
     sink.inputs = {
-        name: "Sink"
+        name: "Sink",
+        position: new Vector(0, 0, 0),
+        orientation: new Vector(0, 0, 0),
+        scale: new Vector(1, 1, 1)
     }
 
     console.log("Run 1")
@@ -57,7 +75,7 @@ async function run() {
 
     console.log("Run 2")
     
-    console.log(await model.simulate(10000, 1), "ms")
+    console.log(await model.simulate(10000), "ms")
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
@@ -65,7 +83,7 @@ async function run() {
 
     console.log("Run 3")
     
-    console.log(await model.simulate(10000, 0.5), "ms")
+    console.log(await model.simulate(10000), "ms")
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)

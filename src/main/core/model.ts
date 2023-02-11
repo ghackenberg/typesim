@@ -24,9 +24,9 @@ export class Model {
     private _simulation: boolean = false
     private _visualization: boolean = false
 
-    private renderer: WebGLRenderer
-    private camera: PerspectiveCamera
-    private scene: Scene
+    public renderer: WebGLRenderer
+    public camera: PerspectiveCamera
+    public scene: Scene
 
     constructor() {
         Model._INSTANCES.push(this)
@@ -143,6 +143,10 @@ export class Model {
         // Update all static components
         for (const component of this.staticComponents) {
             component.update()
+        }
+        // Initial render
+        if (this.visualization) {
+            this.render()
         }
 
         // Execute loop
