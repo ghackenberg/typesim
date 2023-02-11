@@ -3,6 +3,21 @@ import { Event } from "./event.js"
 
 export class Model {
 
+    private static _instances: Model[] = []
+    private static _instance: Model
+
+    public static get instances() {
+        return Model._instances
+    }
+
+    public static get instance() {
+        return Model._instance
+    }
+    private static set instance(value: Model) {
+        Model.instances.push(value)
+        Model._instance = value
+    }
+
     private staticComponents: Component<any, any>[] = []
     private dynamicComponents: Component<any, any>[]
 
@@ -10,6 +25,10 @@ export class Model {
     private _time: number
     private _progress: number
     private _simulation: boolean = false
+
+    constructor() {
+        Model.instance = this
+    }
 
     addStaticComponent(component: Component<any, any>) {
         this.staticComponents.push(component)

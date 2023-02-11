@@ -21,6 +21,18 @@ export abstract class Component<I, O> {
 
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
+    
+    constructor(model: Model = Model.instance, inputs: I & ComponentI = undefined) {
+        this.model = model
+        this.inputs = inputs
+        if (model.simulation) {
+            this.type = ComponentType.DYNAMIC
+            model.addDynamicComponent(this)
+        } else {
+            this.type = ComponentType.STATIC
+            model.addStaticComponent(this)
+        }
+    }
 
     get type() {
         return this._type
@@ -95,18 +107,6 @@ export abstract class Component<I, O> {
             })
         }
         this._outputs = copy
-    }
-    
-    constructor(model: Model, inputs: I & ComponentI = undefined) {
-        this.model = model
-        this.inputs = inputs
-        if (model.simulation) {
-            this.type = ComponentType.DYNAMIC
-            model.addDynamicComponent(this)
-        } else {
-            this.type = ComponentType.STATIC
-            model.addStaticComponent(this)
-        }
     }
     
     abstract reset()

@@ -5,11 +5,11 @@ async function run() {
 
     const model = new Model()
     
-    const source = new Source(model)
-    const queue = new Queue(model)
-    const server = new Server(model)
-    const branch = new Branch(model)
-    const sink = new Sink(model)
+    const source = new Source()
+    const queue = new Queue()
+    const server = new Server()
+    const branch = new Branch()
+    const sink = new Sink()
     
     source.inputs = {
         name: "Source",
