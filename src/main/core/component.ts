@@ -158,12 +158,12 @@ export abstract class Component<I, O> {
         // Perform update
         Component.CONTEXT.push(this)
         console.debug(Component.CONTEXT.map(comp => comp.inputs.name), "update start")
-        this.process()
+        this.processUpdate()
         console.debug(Component.CONTEXT.map(comp => comp.inputs.name), "update end")
         Component.CONTEXT.pop()
     }
 
-    protected process() {
+    protected processUpdate() {
 
     }
 

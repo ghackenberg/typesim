@@ -42,7 +42,7 @@ export class Source extends Component<SourceI, SourceO> {
         this.mesh = new Mesh(this.geometry, this.material)
         return this.mesh
     }
-    protected override process() {
+    protected override processUpdate() {
         const factory = this.inputs.factory
         const count = this.inputs.count
         const next = this.inputs.next
@@ -61,7 +61,7 @@ export class Source extends Component<SourceI, SourceO> {
             this.outputs.object = object
             this.outputs.count++
 
-            next.send(object)
+            next.sendComponent(object)
         }
 
         const time = this.model.time + this.inputs.interArrivalTime

@@ -37,13 +37,13 @@ export class Branch extends FlowComponent<BranchI, BranchO> {
 
     // FlowComponent
 
-    protected override recieve(component: Component<any, any>) {
+    protected override recieveComponent(component: Component<any, any>) {
         this.outputs.object = component
         this.outputs.count++
 
         const next = this.inputs.next
         const choice = this.inputs.choice
 
-        next[choice].send(component)
+        next[choice].sendComponent(component)
     }
 }

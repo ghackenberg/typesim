@@ -1,14 +1,16 @@
 import { Component } from "../component.js"
 
 export abstract class FlowComponent<I, O> extends Component<I, O> {
+    
     // FlowComponent
 
-    send(component: Component<any, any>) {
+    sendComponent(component: Component<any, any>) {
         Component.CONTEXT.push(this)
         component.move(this.outputs.position.x, this.outputs.position.y, this.outputs.position.z)
-        this.recieve(component)
+        this.recieveComponent(component)
         Component.CONTEXT.pop()
     }
 
-    protected abstract recieve(component: Component<any ,any>)
+    protected abstract recieveComponent(component: Component<any ,any>)
+    
 }

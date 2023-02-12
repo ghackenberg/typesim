@@ -38,11 +38,11 @@ export class Server extends Component<ServerI, ServerO> {
         this.mesh = new Mesh(this.geometry, this.material)
         return this.mesh
     }
-    protected override process() {
+    protected override processUpdate() {
         if (this.outputs.object != null && this.outputs.departureTime == this.model.time) {
             const next = this.inputs.next
 
-            next.send(this.outputs.object)
+            next.sendComponent(this.outputs.object)
 
             this.outputs.object = null
         }
@@ -52,7 +52,7 @@ export class Server extends Component<ServerI, ServerO> {
             if (queue.outputs.length > 0) {
                 const time = this.model.time + this.inputs.serviceTime
 
-                this.outputs.object = queue.take()
+                this.outputs.object = queue.takeComponent()
                 this.outputs.departureTime = time
                 this.outputs.count += 1
     
