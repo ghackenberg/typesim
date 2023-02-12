@@ -150,11 +150,6 @@ export class Model {
         for (const component of this.staticComponents) {
             component.reset()
         }
-        // Update all static components
-        console.debug("Simulation update")
-        for (const component of this.staticComponents) {
-            component.update()
-        }
         // Initial render
         if (this.visualization) {
             console.debug("Simulation render")

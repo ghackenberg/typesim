@@ -131,6 +131,9 @@ export abstract class Component<I, O> {
         if (this.model.visualization) {
             this.visualization = this.initVisualization()
             if (this.visualization) {
+                this.visualization.position.x = this.outputs.position.x
+                this.visualization.position.y = this.outputs.position.y
+                this.visualization.position.z = this.outputs.position.z
                 this.model.scene.add(this.visualization)
             }
         }

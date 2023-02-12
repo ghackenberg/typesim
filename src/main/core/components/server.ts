@@ -32,6 +32,11 @@ export class Server extends Component<ServerI, ServerO> {
             count: 0
         }
     }
+    protected override initUpdates() {
+        return [
+            this.model.time
+        ]
+    }
     protected override initVisualization() {
         this.geometry = new BoxGeometry()
         this.material = new MeshBasicMaterial()
