@@ -125,7 +125,9 @@ export abstract class Component<I, O> {
     
     reset() {
         this.outputs = this.initOutputs()
-        this.initUpdates()
+        for (const time of this.initUpdates()) {
+            this.model.scheduleUpdate(time, this)
+        }
         if (this.model.visualization) {
             this.visualization = this.initVisualization()
             if (this.visualization) {
@@ -136,10 +138,9 @@ export abstract class Component<I, O> {
 
     protected abstract initOutputs(): ComponentO & O
 
-    protected initUpdates() {
-        
+    protected initUpdates(): number[] {
+        return []
     }
-
     protected initVisualization(): Object3D {
         return null
     }

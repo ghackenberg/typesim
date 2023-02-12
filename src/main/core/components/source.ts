@@ -32,8 +32,9 @@ export class Source extends Component<SourceI, SourceO> {
         }
     }
     protected override initUpdates() {
-        const time = this.model.time + this.inputs.firstArrivalTime
-        this.model.scheduleUpdate(time, this)
+        return [
+            this.model.time + this.inputs.firstArrivalTime
+        ]
     }
     protected override initVisualization() {
         this.geometry = new BoxGeometry()
