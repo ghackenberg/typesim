@@ -18,11 +18,11 @@ export class Server extends Component<ServerI, ServerO> {
     private geometry: BoxGeometry
     private material: MeshBasicMaterial
     private mesh: Mesh
-    override check() {
-        return []
-    }
-    override reset() {
-        this.outputs = {
+
+    // Component
+
+    protected override initOutputs() {
+        return {
             name: this.inputs.name,
             position: this.inputs.position,
             orientation: this.inputs.orientation,
@@ -31,12 +31,12 @@ export class Server extends Component<ServerI, ServerO> {
             departureTime: 0,
             count: 0
         }
-        if (this.model.visualization) {
-            this.geometry = new BoxGeometry()
-            this.material = new MeshBasicMaterial()
-            this.mesh = new Mesh(this.geometry, this.material)
-            this.object = this.mesh
-        }
+    }
+    protected override initVisualization() {
+        this.geometry = new BoxGeometry()
+        this.material = new MeshBasicMaterial()
+        this.mesh = new Mesh(this.geometry, this.material)
+        return this.mesh
     }
     protected override process() {
         if (this.outputs.object != null && this.outputs.departureTime == this.model.time) {

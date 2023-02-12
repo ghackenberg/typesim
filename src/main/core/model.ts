@@ -24,9 +24,11 @@ export class Model {
     private _simulation: boolean = false
     private _visualization: boolean = false
 
-    public renderer: WebGLRenderer
-    public camera: PerspectiveCamera
-    public scene: Scene
+    private renderer: WebGLRenderer
+    private camera: PerspectiveCamera
+    private _scene: Scene
+
+    private frame: number = 0
 
     constructor() {
         Model._INSTANCES.push(this)
@@ -103,6 +105,13 @@ export class Model {
     private set visualization(value: boolean) {
         this._visualization = value
     }
+
+    get scene() {
+        return this._scene
+    }
+    private set scene(value: Scene) {
+        this._scene = value
+    }
     
     async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
         if (this.simulation) {
@@ -112,7 +121,7 @@ export class Model {
         // Check all components
         let issues: string[] = []
         for (const component of this.staticComponents) {
-            issues = issues.concat(component.check())
+            issues = issues.concat(component.checkInputs())
         }
         if (issues.length > 0) {
             throw issues
@@ -246,7 +255,12 @@ export class Model {
     }
 
     private render() {
-        this.renderer.render(this.scene, this.camera)
+        if (this.frame == 0) {
+            this.frame = requestAnimationFrame(() => {
+                this.renderer.render(this.scene, this.camera)
+                this.frame = 0
+            })
+        }
     }
     
 }

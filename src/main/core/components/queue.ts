@@ -12,11 +12,11 @@ export class Queue extends FlowComponent<QueueI, QueueO> {
     private geometry: BoxGeometry
     private material: MeshBasicMaterial
     private mesh: Mesh
-    override check() {
-        return []
-    }
-    override reset() {
-        this.outputs = {
+
+    // Component
+
+    protected override initOutputs() {
+        return {
             name: this.inputs.name,
             position: this.inputs.position,
             orientation: this.inputs.orientation,
@@ -24,18 +24,22 @@ export class Queue extends FlowComponent<QueueI, QueueO> {
             objects: [],
             length: 0
         }
-        if (this.model.visualization) {
-            this.geometry = new BoxGeometry()
-            this.material = new MeshBasicMaterial()
-            this.mesh = new Mesh(this.geometry, this.material)
-            this.object = this.mesh
-        }
     }
+    protected override initVisualization() {
+        this.geometry = new BoxGeometry()
+        this.material = new MeshBasicMaterial()
+        this.mesh = new Mesh(this.geometry, this.material)
+        return this.mesh
+    }
+
+    // FlowComponent
 
     protected override recieve(component: Component<any, any>) {
         this.outputs.objects.push(component)
         this.outputs.length += 1
     }
+
+    // Queue
 
     public take() {
         Component.CONTEXT.push(this)

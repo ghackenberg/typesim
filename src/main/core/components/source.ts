@@ -18,11 +18,11 @@ export class Source extends Component<SourceI, SourceO> {
     private geometry: BoxGeometry
     private material: MeshBasicMaterial
     private mesh: Mesh
-    override check() {
-        return []
-    }
-    override reset() {
-        this.outputs = {
+
+    // Component
+
+    protected override initOutputs() {
+        return {
             name: this.inputs.name,
             position: this.inputs.position,
             orientation: this.inputs.orientation,
@@ -30,14 +30,16 @@ export class Source extends Component<SourceI, SourceO> {
             object: null,
             count: 0
         }
+    }
+    protected override initUpdates() {
         const time = this.model.time + this.inputs.firstArrivalTime
         this.model.scheduleUpdate(time, this)
-        if (this.model.visualization) {
-            this.geometry = new BoxGeometry()
-            this.material = new MeshBasicMaterial()
-            this.mesh = new Mesh(this.geometry, this.material)
-            this.object = this.mesh
-        }
+    }
+    protected override initVisualization() {
+        this.geometry = new BoxGeometry()
+        this.material = new MeshBasicMaterial()
+        this.mesh = new Mesh(this.geometry, this.material)
+        return this.mesh
     }
     protected override process() {
         const factory = this.inputs.factory
@@ -47,7 +49,11 @@ export class Source extends Component<SourceI, SourceO> {
         for (let index = 0; index < count; index++) {
             const object = factory()
             
-            object.check()
+            const issues = object.checkInputs()
+            if (issues.length > 0) {
+                throw issues
+            }
+
             object.reset()
             object.update()
             

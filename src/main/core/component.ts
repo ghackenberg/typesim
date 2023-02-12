@@ -30,7 +30,7 @@ export abstract class Component<I, O> {
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
 
-    private _object: Object3D
+    private visualization: Object3D
     
     constructor(model: Model = Model.INSTANCE, inputs: I & ComponentI = undefined) {
         this.model = model
@@ -119,17 +119,30 @@ export abstract class Component<I, O> {
         this._outputs = copy
     }
 
-    protected get object() {
-        return this._object
+    checkInputs(): string[] {
+        return []
     }
-    protected set object(value: Object3D) {
-        this._object = value
-        this.model.scene.add(value)
+    
+    reset() {
+        this.outputs = this.initOutputs()
+        this.initUpdates()
+        if (this.model.visualization) {
+            this.visualization = this.initVisualization()
+            if (this.visualization) {
+                this.model.scene.add(this.visualization)
+            }
+        }
     }
 
-    abstract check(): string[]
-    
-    abstract reset()
+    protected abstract initOutputs(): ComponentO & O
+
+    protected initUpdates() {
+        
+    }
+
+    protected initVisualization(): Object3D {
+        return null
+    }
 
     update() {
         // Update tracking state
@@ -156,10 +169,10 @@ export abstract class Component<I, O> {
     move(x: number, y: number, z: number) {
         Component.CONTEXT.push(this)
         this.outputs.position = new Vector(x, y, z)
-        if (this.model.visualization) {
-            this.object.position.x = x
-            this.object.position.y = y
-            this.object.position.z = z
+        if (this.model.visualization && this.visualization) {
+            this.visualization.position.x = x
+            this.visualization.position.y = y
+            this.visualization.position.z = z
         }
         Component.CONTEXT.pop()
     }
