@@ -75,7 +75,7 @@ async function run() {
 
     console.log("Run 2")
     
-    console.log(await model.simulate(10000), "ms")
+    console.log(await model.simulate(10000, 2), "ms")
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
@@ -83,7 +83,7 @@ async function run() {
 
     console.log("Run 3")
     
-    console.log(await model.simulate(10000), "ms")
+    console.log(await model.simulate(10000, 1), "ms")
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)

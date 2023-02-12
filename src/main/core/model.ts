@@ -128,7 +128,7 @@ export class Model {
         this.events = []
         this.time = 0
         this.simulation = true
-        this.visualization = factor != Number.MAX_VALUE
+        this.visualization = factor != Number.MAX_VALUE && typeof window != "undefined"
 
         if (this.visualization) {
             this.renderer = new WebGLRenderer()
@@ -137,19 +137,23 @@ export class Model {
         }
         
         // Reset all static components
+        console.debug("Simulation reset")
         for (const component of this.staticComponents) {
             component.reset()
         }
         // Update all static components
+        console.debug("Simulation update")
         for (const component of this.staticComponents) {
             component.update()
         }
         // Initial render
         if (this.visualization) {
+            console.debug("Simulation render")
             this.render()
         }
 
         // Execute loop
+        console.debug("Simulation loop")
         if (factor == Number.MAX_VALUE) {
             this.loopSync(until)
         } else {
@@ -195,9 +199,13 @@ export class Model {
                             const deltaSim = (nowSim - startSim) / factor
                             if (deltaReal >= deltaSim) {
                                 this.step()
+                                continue
                             } else {
                                 setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
-                                this.render()
+                                if (this.visualization) {
+                                    this.render()
+                                }
+                                return
                             }
                         } else {
                             break
@@ -210,7 +218,9 @@ export class Model {
                         console.debug('Time:', this.time)
                         console.debug()
                     }
-                    this.render()
+                    if (this.visualization) {
+                        this.render()
+                    }
                     resolve()
                 } catch(error) {
                     reject(error)
