@@ -169,7 +169,7 @@ export abstract class Component<I, O> {
     move(x: number, y: number, z: number) {
         Component.CONTEXT.push(this)
         this.outputs.position = new Vector(x, y, z)
-        if (this.model.visualization && this.visualization) {
+        if (this.visualization) {
             this.visualization.position.x = x
             this.visualization.position.y = y
             this.visualization.position.z = z
