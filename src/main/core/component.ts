@@ -60,7 +60,7 @@ export abstract class Component<I, O> {
         this._model = value
     }
 
-    protected get defaults(): Partial<I & ComponentI> {
+    protected get defaults(): Readonly<Partial<I & ComponentI>> {
         return {
             position: new Vector(0, 0, 0),
             orientation: new Vector(0, 0, 0),
@@ -68,7 +68,7 @@ export abstract class Component<I, O> {
         } as Partial<I & ComponentI>
     }
 
-    get inputs() {
+    get inputs(): Readonly<ComponentI & I> {
         return this._inputs
     }
     set inputs(value: I & ComponentI) {
