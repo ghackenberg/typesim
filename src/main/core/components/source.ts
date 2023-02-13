@@ -21,12 +21,12 @@ export class Source extends Component<SourceI, SourceO> {
 
     // Component
 
-    override get defaults() {
+    protected override get defaults() {
         return {
+            ...super.defaults,
             firstArrivalTime: 0,
             interArrivalTime: 1000,
-            count: 0,
-            ...super.defaults
+            count: 0
         }
     }
     protected override initOutputs() {

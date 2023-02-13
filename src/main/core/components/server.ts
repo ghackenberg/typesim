@@ -21,10 +21,10 @@ export class Server extends Component<ServerI, ServerO> {
 
     // Component
 
-    override get defaults() {
+    protected override get defaults() {
         return {
-            serviceTime: 1000,
-            ...super.defaults
+            ...super.defaults,
+            serviceTime: 1000
         }
     }
     protected override initOutputs() {
