@@ -38,8 +38,8 @@ export class Branch extends FlowComponent<BranchI, BranchO> {
     // FlowComponent
 
     protected override recieveComponent(component: Component<any, any>) {
-        this.outputs.object = component
-        this.outputs.count++
+        this._outputs.object = component
+        this._outputs.count++
 
         const next = this.inputs.next
         const choice = this.inputs.choice

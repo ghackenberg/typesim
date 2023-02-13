@@ -25,7 +25,7 @@ export abstract class Component<I, O> {
     private _type: ComponentType
     private _model: Model
     private _inputs: I & ComponentI
-    private _outputs: O & ComponentO
+    protected _outputs: O & ComponentO
 
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
@@ -95,7 +95,7 @@ export abstract class Component<I, O> {
         this._inputs = copy as ComponentI & I
     }
 
-    get outputs() {
+    get outputs(): Readonly<ComponentO & O> {
         return this._outputs
     }
     protected set outputs(value: O & ComponentO) {
@@ -199,7 +199,7 @@ export abstract class Component<I, O> {
 
     move(x: number, y: number, z: number) {
         Component.CONTEXT.push(this)
-        this.outputs.position = new Vector(x, y, z)
+        this._outputs.position = new Vector(x, y, z)
         if (this.visualization) {
             this.visualization.position.x = x
             this.visualization.position.y = y

@@ -70,15 +70,15 @@ export class Source extends Component<SourceI, SourceO> {
                 object.reset()
                 object.update()
                 
-                this.outputs.object = object
-                this.outputs.count++
+                this._outputs.object = object
+                this._outputs.count++
     
                 next.sendComponent(object)
             }
     
             const time = this.model.time + this.inputs.interArrivalTime
 
-            this.outputs.arrivalTime = time
+            this._outputs.arrivalTime = time
 
             this.model.scheduleUpdate(time, this)
         }

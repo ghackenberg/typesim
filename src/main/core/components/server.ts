@@ -55,7 +55,7 @@ export class Server extends Component<ServerI, ServerO> {
 
             next.sendComponent(this.outputs.object)
 
-            this.outputs.object = null
+            this._outputs.object = null
         }
         if (this.outputs.object == null) {
             const queue = this.inputs.queue
@@ -63,9 +63,9 @@ export class Server extends Component<ServerI, ServerO> {
             if (queue.outputs.length > 0) {
                 const time = this.model.time + this.inputs.serviceTime
 
-                this.outputs.object = queue.takeComponent()
-                this.outputs.departureTime = time
-                this.outputs.count += 1
+                this._outputs.object = queue.takeComponent()
+                this._outputs.departureTime = time
+                this._outputs.count += 1
     
                 this.model.scheduleUpdate(time, this)
             }

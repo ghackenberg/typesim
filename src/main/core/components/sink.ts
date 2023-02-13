@@ -35,7 +35,7 @@ export class Sink extends FlowComponent<SinkI, SinkO> {
     // FlowComponent
 
     protected override recieveComponent(component: Component<any, any>) {
-        this.outputs.object = component
-        this.outputs.count += 1
+        this._outputs.object = component
+        this._outputs.count += 1
     }
 }

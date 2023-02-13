@@ -35,15 +35,15 @@ export class Queue extends FlowComponent<QueueI, QueueO> {
     // FlowComponent
 
     protected override recieveComponent(component: Component<any, any>) {
-        this.outputs.objects.push(component)
-        this.outputs.length += 1
+        this._outputs.objects.push(component)
+        this._outputs.length += 1
     }
 
     // Queue
 
     public takeComponent() {
         Component.CONTEXT.push(this)
-        this.outputs.length -= 1
+        this._outputs.length -= 1
         const object = this.outputs.objects.shift()
         Component.CONTEXT.pop()
         return object
