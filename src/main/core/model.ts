@@ -14,8 +14,8 @@ export class Model {
         return Model._INSTANCE
     }
 
-    private staticComponents: Component<any, any>[] = []
-    private dynamicComponents: Component<any, any>[]
+    public staticComponents: Component<any, any>[] = []
+    public dynamicComponents: Component<any, any>[]
 
     private updates: Map<Component<any, any>, number[]>
     private events: Event[]
