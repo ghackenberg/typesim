@@ -1,5 +1,5 @@
 import { Display } from "./display.js"
-import { Box } from "./displays/box.js"
+import { Box } from "./displays/primitives/box.js"
 import { Model } from "./model.js"
 import { Vector } from "./vector.js"
 

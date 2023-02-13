@@ -1,5 +1,5 @@
-import { Vector } from "../vector.js"
-import { Primitive } from "./primitive.js"
+import { Vector } from "../../vector.js"
+import { Primitive } from "../primitive.js"
 
 export class SphereImpl extends Primitive {
     constructor(position: Vector, orientation: Vector, scale: Vector, color: string, public radius: number) {

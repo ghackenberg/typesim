@@ -1,5 +1,5 @@
-import { Vector } from "../vector.js"
-import { Primitive } from "./primitive.js"
+import { Vector } from "../../vector.js"
+import { Primitive } from "../primitive.js"
 
 export class BoxImpl extends Primitive {
     constructor(position: Vector, orientation: Vector, scale: Vector, color: string, public width: number, public height: number, public length: number) {
