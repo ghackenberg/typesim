@@ -1,4 +1,5 @@
-import { Object3D } from "three"
+import { Display } from "./display.js"
+import { Box } from "./displays/box.js"
 import { Model } from "./model.js"
 import { Vector } from "./vector.js"
 
@@ -7,11 +8,13 @@ interface ComponentI {
     position?: Vector
     orientation?: Vector
     scale?: Vector
+    display?: Display
 }
 interface ComponentO {
     name: string
     position: Vector
     orientation: Vector
+    display: Display
     scale: Vector
 }
 
@@ -29,8 +32,6 @@ export abstract class Component<I, O> {
 
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
-
-    private visualization: Object3D
     
     constructor(model: Model = Model.INSTANCE, inputs: ComponentI & I = undefined) {
         this.model = model
@@ -62,9 +63,10 @@ export abstract class Component<I, O> {
 
     protected get defaults(): Readonly<Partial<I & ComponentI>> {
         return {
-            position: new Vector(0, 0, 0),
-            orientation: new Vector(0, 0, 0),
-            scale: new Vector(1, 1, 1)
+            position: [0, 0, 0],
+            orientation: [0, 0, 0],
+            scale: [1, 1, 1],
+            display: Box() as Display
         } as Partial<I & ComponentI>
     }
 
@@ -155,24 +157,12 @@ export abstract class Component<I, O> {
         for (const time of this.initUpdates()) {
             this.model.scheduleUpdate(time, this)
         }
-        if (this.model.visualization) {
-            this.visualization = this.initVisualization()
-            if (this.visualization) {
-                this.visualization.position.x = this.outputs.position.x
-                this.visualization.position.y = this.outputs.position.y
-                this.visualization.position.z = this.outputs.position.z
-                this.model.scene.add(this.visualization)
-            }
-        }
     }
 
     protected abstract initOutputs(): ComponentO & O
 
     protected initUpdates(): number[] {
         return []
-    }
-    protected initVisualization(): Object3D {
-        return null
     }
 
     update() {
@@ -197,14 +187,9 @@ export abstract class Component<I, O> {
 
     }
 
-    move(x: number, y: number, z: number) {
+    move(position: Vector) {
         Component.CONTEXT.push(this)
-        this._outputs.position = new Vector(x, y, z)
-        if (this.visualization) {
-            this.visualization.position.x = x
-            this.visualization.position.y = y
-            this.visualization.position.z = z
-        }
+        this._outputs.position = [position[0], position[1], position[2]]
         Component.CONTEXT.pop()
     }
     

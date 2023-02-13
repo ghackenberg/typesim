@@ -1,4 +1,3 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
 import { Component } from "./component.js"
 import { Event } from "./event.js"
 
@@ -23,10 +22,6 @@ export class Model {
     private _time: number
     private _simulation: boolean = false
     private _visualization: boolean = false
-
-    private renderer: WebGLRenderer
-    private camera: PerspectiveCamera
-    private _scene: Scene
 
     private frame: number = 0
 
@@ -105,13 +100,6 @@ export class Model {
     private set visualization(value: boolean) {
         this._visualization = value
     }
-
-    get scene() {
-        return this._scene
-    }
-    private set scene(value: Scene) {
-        this._scene = value
-    }
     
     async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
         if (this.simulation) {
@@ -138,12 +126,6 @@ export class Model {
         this.time = 0
         this.simulation = true
         this.visualization = factor != Number.MAX_VALUE && typeof window != "undefined"
-
-        if (this.visualization) {
-            this.renderer = new WebGLRenderer()
-            this.camera = new PerspectiveCamera()
-            this.scene = new Scene()
-        }
         
         // Reset all static components
         console.debug("Simulation reset")
@@ -252,7 +234,6 @@ export class Model {
     private render() {
         if (this.frame == 0) {
             this.frame = requestAnimationFrame(() => {
-                this.renderer.render(this.scene, this.camera)
                 this.frame = 0
             })
         }

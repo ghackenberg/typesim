@@ -1,4 +1,3 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial } from "three"
 import { Component } from "../component.js"
 import { FlowComponent } from "./flow.js"
 
@@ -9,10 +8,6 @@ interface QueueO {
 }
 
 export class Queue extends FlowComponent<QueueI, QueueO> {
-    private geometry: BoxGeometry
-    private material: MeshBasicMaterial
-    private mesh: Mesh
-
     // Component
 
     protected override initOutputs() {
@@ -21,15 +16,10 @@ export class Queue extends FlowComponent<QueueI, QueueO> {
             position: this.inputs.position,
             orientation: this.inputs.orientation,
             scale: this.inputs.scale,
+            display: this.inputs.display,
             objects: [],
             length: 0
         }
-    }
-    protected override initVisualization() {
-        this.geometry = new BoxGeometry()
-        this.material = new MeshBasicMaterial()
-        this.mesh = new Mesh(this.geometry, this.material)
-        return this.mesh
     }
 
     // FlowComponent

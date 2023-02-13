@@ -1,4 +1,3 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial } from "three"
 import { Component } from "../component.js"
 import { FlowComponent } from "./flow.js"
 
@@ -16,10 +15,6 @@ interface SourceO {
 }
 
 export class Source extends Component<SourceI, SourceO> {
-    private geometry: BoxGeometry
-    private material: MeshBasicMaterial
-    private mesh: Mesh
-
     // Component
 
     protected override get defaults() {
@@ -37,6 +32,7 @@ export class Source extends Component<SourceI, SourceO> {
             position: this.inputs.position,
             orientation: this.inputs.orientation,
             scale: this.inputs.scale,
+            display: this.inputs.display,
             arrivalTime: time,
             object: null,
             count: 0
@@ -46,12 +42,6 @@ export class Source extends Component<SourceI, SourceO> {
         return [
             this.outputs.arrivalTime
         ]
-    }
-    protected override initVisualization() {
-        this.geometry = new BoxGeometry()
-        this.material = new MeshBasicMaterial()
-        this.mesh = new Mesh(this.geometry, this.material)
-        return this.mesh
     }
     protected override processUpdate() {
         if (this.model.time == this.outputs.arrivalTime) {

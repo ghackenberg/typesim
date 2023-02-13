@@ -1,5 +1,1 @@
-export class Vector {
-    constructor(public x: number, public y: number, public z: number) {
-        
-    }
-}
+export type Vector = [number, number, number]
