@@ -10,6 +10,7 @@ interface SourceI {
     next: FlowComponent<any, any>
 }
 interface SourceO {
+    arrivalTime: number,
     object: Component<any, any>
     count: number
 }
@@ -30,18 +31,20 @@ export class Source extends Component<SourceI, SourceO> {
         }
     }
     protected override initOutputs() {
+        const time = this.model.time + this.inputs.firstArrivalTime
         return {
             name: this.inputs.name,
             position: this.inputs.position,
             orientation: this.inputs.orientation,
             scale: this.inputs.scale,
+            arrivalTime: time,
             object: null,
             count: 0
         }
     }
     protected override initUpdates() {
         return [
-            this.model.time + this.inputs.firstArrivalTime
+            this.outputs.arrivalTime
         ]
     }
     protected override initVisualization() {
@@ -51,28 +54,33 @@ export class Source extends Component<SourceI, SourceO> {
         return this.mesh
     }
     protected override processUpdate() {
-        const factory = this.inputs.factory
-        const count = this.inputs.count
-        const next = this.inputs.next
-
-        for (let index = 0; index < count; index++) {
-            const object = factory()
-            
-            const issues = object.checkInputs()
-            if (issues.length > 0) {
-                throw issues
+        if (this.model.time == this.outputs.arrivalTime) {
+            const factory = this.inputs.factory
+            const count = this.inputs.count
+            const next = this.inputs.next
+    
+            for (let index = 0; index < count; index++) {
+                const object = factory()
+                
+                const issues = object.checkInputs()
+                if (issues.length > 0) {
+                    throw issues
+                }
+    
+                object.reset()
+                object.update()
+                
+                this.outputs.object = object
+                this.outputs.count++
+    
+                next.sendComponent(object)
             }
+    
+            const time = this.model.time + this.inputs.interArrivalTime
 
-            object.reset()
-            object.update()
-            
-            this.outputs.object = object
-            this.outputs.count++
+            this.outputs.arrivalTime = time
 
-            next.sendComponent(object)
+            this.model.scheduleUpdate(time, this)
         }
-
-        const time = this.model.time + this.inputs.interArrivalTime
-        this.model.scheduleUpdate(time, this)
     }
 }

@@ -22,7 +22,7 @@ async function run() {
             return Math.random() * 10
         },
         get interArrivalTime() {
-            return Math.random() * 20
+            return Math.random() * 2000
         },
         next: queue
     }
@@ -33,7 +33,7 @@ async function run() {
         name: "Server",
         queue: queue,
         get serviceTime() {
-            return Math.random() * 30
+            return Math.random() * 3000
         },
         next: branch
     }
