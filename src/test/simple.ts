@@ -1,4 +1,4 @@
-import { Branch, Entity, Model, Queue, Server, Sink, Source, Vector } from '../main/index.js'
+import { Branch, Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
 
 async function run() {
     console.debug = () => {}
@@ -13,37 +13,24 @@ async function run() {
     
     source.inputs = {
         name: "Source",
-        position: new Vector(0, 0, 0),
-        orientation: new Vector(0, 0, 0),
-        scale: new Vector(1, 1, 1),
         factory() {
             return new Entity(model, {
-                name: `Entity_${source.outputs.count}`,
-                position: new Vector(0, 0, 0),
-                orientation: new Vector(0, 0, 0),
-                scale: new Vector(1, 1, 1)
+                name: `Entity_${source.outputs.count}`
             })
         },
         get count() {
             return Math.random() * 10
         },
-        firstArrivalTime: 0,
         get interArrivalTime() {
             return Math.random() * 20
         },
         next: queue
     }
     queue.inputs = {
-        name: "Queue",
-        position: new Vector(0, 0, 0),
-        orientation: new Vector(0, 0, 0),
-        scale: new Vector(1, 1, 1)
+        name: "Queue"
     }
     server.inputs = {
         name: "Server",
-        position: new Vector(0, 0, 0),
-        orientation: new Vector(0, 0, 0),
-        scale: new Vector(1, 1, 1),
         queue: queue,
         get serviceTime() {
             return Math.random() * 30
@@ -52,17 +39,11 @@ async function run() {
     }
     branch.inputs = {
         name: "Branch",
-        position: new Vector(0, 0, 0),
-        orientation: new Vector(0, 0, 0),
-        scale: new Vector(1, 1, 1),
         next: [sink],
         choice: 0
     }
     sink.inputs = {
-        name: "Sink",
-        position: new Vector(0, 0, 0),
-        orientation: new Vector(0, 0, 0),
-        scale: new Vector(1, 1, 1)
+        name: "Sink"
     }
 
     console.log("Run 1")

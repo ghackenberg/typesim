@@ -3,11 +3,11 @@ import { Component } from "../component.js"
 import { FlowComponent } from "./flow.js"
 
 interface SourceI {
-    get factory(): () => Component<any, any>
-    get firstArrivalTime(): number
-    get interArrivalTime(): number
-    get count(): number
-    get next(): FlowComponent<any, any>
+    factory: () => Component<any, any>
+    firstArrivalTime?: number
+    interArrivalTime?: number
+    count?: number
+    next: FlowComponent<any, any>
 }
 interface SourceO {
     object: Component<any, any>
@@ -21,6 +21,14 @@ export class Source extends Component<SourceI, SourceO> {
 
     // Component
 
+    override get defaults() {
+        return {
+            firstArrivalTime: 0,
+            interArrivalTime: 1000,
+            count: 0,
+            ...super.defaults
+        }
+    }
     protected override initOutputs() {
         return {
             name: this.inputs.name,

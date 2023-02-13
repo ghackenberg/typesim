@@ -4,9 +4,9 @@ import { FlowComponent } from "./flow.js"
 import { Queue } from "./queue.js"
 
 interface ServerI {
-    get queue(): Queue
-    get serviceTime(): number
-    get next(): FlowComponent<any, any>
+    queue: Queue
+    serviceTime?: number
+    next: FlowComponent<any, any>
 }
 interface ServerO {
     object: Component<any, any>
@@ -21,6 +21,12 @@ export class Server extends Component<ServerI, ServerO> {
 
     // Component
 
+    override get defaults() {
+        return {
+            serviceTime: 1000,
+            ...super.defaults
+        }
+    }
     protected override initOutputs() {
         return {
             name: this.inputs.name,

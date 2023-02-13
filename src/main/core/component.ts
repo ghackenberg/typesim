@@ -3,10 +3,10 @@ import { Model } from "./model.js"
 import { Vector } from "./vector.js"
 
 interface ComponentI {
-    get name(): string
-    get position(): Vector
-    get orientation(): Vector
-    get scale(): Vector
+    name: string
+    position?: Vector
+    orientation?: Vector
+    scale?: Vector
 }
 interface ComponentO {
     name: string
@@ -32,9 +32,11 @@ export abstract class Component<I, O> {
 
     private visualization: Object3D
     
-    constructor(model: Model = Model.INSTANCE, inputs: I & ComponentI = undefined) {
+    constructor(model: Model = Model.INSTANCE, inputs: ComponentI & I = undefined) {
         this.model = model
-        this.inputs = inputs
+        if (inputs) {
+            this.inputs = inputs
+        }
         if (model.simulation) {
             this.type = ComponentType.DYNAMIC
             model.addDynamicComponent(this)
@@ -58,6 +60,14 @@ export abstract class Component<I, O> {
         this._model = value
     }
 
+    protected get defaults(): Partial<I & ComponentI> {
+        return {
+            position: new Vector(0, 0, 0),
+            orientation: new Vector(0, 0, 0),
+            scale: new Vector(1, 1, 1)
+        } as Partial<I & ComponentI>
+    }
+
     get inputs() {
         return this._inputs
     }
@@ -65,15 +75,32 @@ export abstract class Component<I, O> {
         if (this._inputs) {
             throw "Cannot set inputs twice!"
         }
-        this._inputs = value
+        const copy = {}
+        for (const p in value) {
+            Object.defineProperty(copy, p, {
+                get: () => {
+                    return value[p]
+                }
+            })
+        }
+        for (const p in this.defaults) {
+            if (!(p in copy)) {
+                Object.defineProperty(copy, p, {
+                    get: () => {
+                        return this.defaults[p]
+                    }
+                })
+            }
+        }
+        this._inputs = copy as ComponentI & I
     }
 
     get outputs() {
         return this._outputs
     }
     protected set outputs(value: O & ComponentO) {
-        const copy = { ...value }
-        for (const p in copy) {
+        const copy = {}
+        for (const p in value) {
             Object.defineProperty(copy, p, {
                 get: () => {
                     if (Component.CONTEXT.length > 0) {
@@ -116,7 +143,7 @@ export abstract class Component<I, O> {
                 }
             })
         }
-        this._outputs = copy
+        this._outputs = copy as ComponentO & O
     }
 
     checkInputs(): string[] {
