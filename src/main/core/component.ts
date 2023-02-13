@@ -33,17 +33,23 @@ export abstract class Component<I, O> {
     private tracking = new Map<Component<any, any>, string[]>()
     private trackedBy = new Map<string, Component<any, any>[]>()
     
-    constructor(model: Model = Model.INSTANCE, inputs: ComponentI & I = undefined) {
-        this.model = model
+    constructor(inputs: ComponentI & I = undefined) {
+        if (!Model.INSTANCE) {
+            throw "Please create model instance first!"
+        }
+
+        this.model = Model.INSTANCE
+        
         if (inputs) {
             this.inputs = inputs
         }
-        if (model.simulation) {
+
+        if (this.model.simulation) {
             this.type = ComponentType.DYNAMIC
-            model.addDynamicComponent(this)
+            this.model.addDynamicComponent(this)
         } else {
             this.type = ComponentType.STATIC
-            model.addStaticComponent(this)
+            this.model.addStaticComponent(this)
         }
     }
 

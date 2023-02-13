@@ -23,7 +23,8 @@ export class Model {
     private _simulation: boolean = false
     private _visualization: boolean = false
 
-    private frame: number = 0
+    private callback: () => void
+    private frame: number
 
     constructor() {
         Model._INSTANCES.push(this)
@@ -101,10 +102,13 @@ export class Model {
         this._visualization = value
     }
     
-    async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
+    async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE, callback: () => void = undefined) {
         if (this.simulation) {
             throw "Simulation already running!"
         }
+
+        this.callback = callback
+        this.frame = 0
 
         // Check all components
         let issues: string[] = []
@@ -125,7 +129,7 @@ export class Model {
         this.events = []
         this.time = 0
         this.simulation = true
-        this.visualization = factor != Number.MAX_VALUE && typeof window != "undefined"
+        this.visualization = !!callback
         
         // Reset all static components
         console.debug("Simulation reset")
@@ -151,7 +155,9 @@ export class Model {
 
         console.debug("Simulation end")
 
-        return Date.now() - start
+        const end = Date.now()
+
+        console.log(end - start, "ms")
     }
 
     private loopSync(until: number) {
@@ -169,6 +175,9 @@ export class Model {
             console.debug('Time:', this.time)
             console.debug()
         }
+        if (this.visualization) {
+            this.render()
+        }
     }
 
     private async loopAsync(until: number, factor: number) {
@@ -185,12 +194,12 @@ export class Model {
                             const deltaSim = (nowSim - startSim) / factor
                             if (deltaReal >= deltaSim) {
                                 this.step()
-                                continue
                             } else {
-                                setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
+                                this.time = deltaReal * factor + startSim
                                 if (this.visualization) {
                                     this.render()
                                 }
+                                setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
                                 return
                             }
                         } else {
@@ -233,9 +242,14 @@ export class Model {
 
     private render() {
         if (this.frame == 0) {
-            this.frame = requestAnimationFrame(() => {
-                this.frame = 0
-            })
+            if (typeof window == "undefined") {
+                this.callback()
+            } else {
+                this.frame = requestAnimationFrame(() => {
+                    this.callback()
+                    this.frame = 0
+                })
+            }
         }
     }
     

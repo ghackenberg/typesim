@@ -1,10 +1,6 @@
 import { Branch, Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
 
-async function run() {
-    console.debug = () => {}
-
-    const model = new Model()
-    
+function simple() {
     const source = new Source()
     const queue = new Queue()
     const server = new Server()
@@ -14,7 +10,7 @@ async function run() {
     source.inputs = {
         name: "Source",
         factory() {
-            return new Entity(model, {
+            return new Entity({
                 name: `Entity_${source.outputs.count}`
             })
         },
@@ -46,9 +42,18 @@ async function run() {
         name: "Sink"
     }
 
+    return { source, queue, server, branch, sink }
+}
+
+async function run() {
+    console.debug = () => {}
+
+    const model = new Model()
+    const { source, queue, sink } = simple()
+
     console.log("Run 1")
 
-    console.log(await model.simulate(10000), "ms")
+    await model.simulate(10000)
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
@@ -56,7 +61,7 @@ async function run() {
 
     console.log("Run 2")
     
-    console.log(await model.simulate(10000, 2), "ms")
+    await model.simulate(10000, 2)
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
@@ -64,7 +69,7 @@ async function run() {
 
     console.log("Run 3")
     
-    console.log(await model.simulate(10000, 1), "ms")
+    await model.simulate(10000, 1)
     
     console.log("Source.count", source.outputs.count)
     console.log("Queue.length", queue.outputs.length)
