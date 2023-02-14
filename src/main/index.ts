@@ -17,6 +17,6 @@ export * from "./core/components/server.js"
 export * from "./core/components/branch.js"
 export * from "./core/components/sink.js"
 
-export * from "./canvas/canvas.js"
+export * from "./view/view.js"
 
 export * from "./misc/expression.js"

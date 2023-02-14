@@ -1,6 +1,8 @@
+import HtmlWebpackPlugin from "html-webpack-plugin"
+
 export default {
     entry: {
-        canvas: "./src/test/canvas.ts"
+        view: "./src/test/view.ts"
     },
     output: {
         filename: "[name].js"
@@ -20,8 +22,9 @@ export default {
             }
         ]
     },
-    devServer: {
-
-    },
-    mode: "development"
+    plugins: [
+        new HtmlWebpackPlugin({
+            filename: "[name].html"
+        })
+    ]
 }

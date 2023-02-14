@@ -1,12 +1,14 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
+import { AmbientLight, BoxGeometry, DirectionalLight, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
-export class Canvas {
-    public element: HTMLCanvasElement
+export class View {
+    public canvas: HTMLCanvasElement
 
     private renderer: WebGLRenderer
-    private scene: Scene
     private camera: PerspectiveCamera
+    private ambient: AmbientLight
+    private directional: DirectionalLight
+    private scene: Scene
 
     constructor(private model: Model, canvas: HTMLCanvasElement = undefined) {
         this.renderer = new WebGLRenderer({
@@ -18,21 +20,44 @@ export class Canvas {
         this.renderer.setPixelRatio(window.devicePixelRatio)
 
         this.camera = new PerspectiveCamera()
+        this.camera.position.x = 5
+        this.camera.position.y = 5
+        this.camera.position.z = 5
+        this.camera.lookAt(new Vector3(0, 0, 0))
+
+        this.ambient = new AmbientLight(0xffffff, 0.5)
+
+        this.directional = new DirectionalLight(0xffffff, 1)
+        this.directional.position.x = 5
+        this.directional.position.y = 2.5
+        this.directional.position.z = 0
+        
+        const geometry = new BoxGeometry()
+        const material = new MeshPhongMaterial({ color: 0xff0000 })
+        const mesh = new Mesh(geometry, material)
 
         this.scene = new Scene()
+        this.scene.add(this.ambient)
+        this.scene.add(this.directional)
+        this.scene.add(mesh)
 
-        this.element = this.renderer.domElement
-        this.element.addEventListener("resize", () => {
+        this.canvas = this.renderer.domElement
+
+        window.addEventListener("resize", () => {
             this.resize()
             this.render()
         })
 
         this.resize()
     }
+    
+    render() {
+        this.renderer.render(this.scene, this.camera)
+    }
 
     private resize() {
-        const width = this.element.offsetWidth
-        const height = this.element.offsetHeight
+        const width = window.innerWidth
+        const height = window.innerHeight
 
         this.renderer.setSize(width, height)
 
@@ -40,10 +65,6 @@ export class Canvas {
 
         this.camera.aspect = aspect
         this.camera.updateProjectionMatrix()
-    }
-    
-    render() {
-        this.renderer.render(this.scene, this.camera)
     }
 
     private drawComposite(display: CompositeImpl) {
