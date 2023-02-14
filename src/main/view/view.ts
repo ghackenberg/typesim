@@ -1,4 +1,4 @@
-import { AmbientLight, BoxGeometry, DirectionalLight, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
+import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
 export class View {
@@ -9,6 +9,7 @@ export class View {
     private ambient: AmbientLight
     private directional: DirectionalLight
     private scene: Scene
+    private group: Group
 
     constructor(private model: Model, canvas: HTMLCanvasElement = undefined) {
         this.renderer = new WebGLRenderer({
@@ -31,15 +32,13 @@ export class View {
         this.directional.position.x = 5
         this.directional.position.y = 2.5
         this.directional.position.z = 0
-        
-        const geometry = new BoxGeometry()
-        const material = new MeshPhongMaterial({ color: 0xff0000 })
-        const mesh = new Mesh(geometry, material)
+
+        this.group = new Group()
 
         this.scene = new Scene()
         this.scene.add(this.ambient)
         this.scene.add(this.directional)
-        this.scene.add(mesh)
+        this.scene.add(this.group)
 
         this.canvas = this.renderer.domElement
 
@@ -52,6 +51,8 @@ export class View {
     }
     
     render() {
+        this.group.clear()
+        this.group.add(this.drawModel())
         this.renderer.render(this.scene, this.camera)
     }
 
@@ -68,31 +69,36 @@ export class View {
     }
 
     private drawComposite(display: CompositeImpl) {
+        const group = new Group()
         for (const child of display.children) {
-            this.drawDisplay(child)
+            group.add(this.drawDisplay(child))
         }
+        return group
     }
     private drawBox(display: BoxImpl) {
-
+        return new BoxGeometry(display.width, display.height, display.length)
     }
     private drawSphere(display: SphereImpl) {
-
+        return new SphereGeometry(display.radius)
     }
     private drawCylinder(display: CylinderImpl) {
-
+        return new CylinderGeometry(display.radius, display.radius, display.height)
     }
     private drawPrimitive(display: Primitive) {
+        const material = new MeshPhongMaterial({ color: display.color })
+        let geometry: BufferGeometry
         if (display instanceof BoxImpl) {
-            this.drawBox(display)
+            geometry = this.drawBox(display)
         } else if (display instanceof SphereImpl) {
-            this.drawSphere(display)
+            geometry = this.drawSphere(display)
         } else if (display instanceof CylinderImpl) {
-            this.drawCylinder(display)
+            geometry = this.drawCylinder(display)
         } else {
             throw "Primitive type not supported!"
         }
+        return new Mesh(geometry, material)
     }
-    private drawImage(display: ImageImpl) {
+    private drawImage(display: ImageImpl): Object3D {
         throw "Image not implemented yet!"
     }
     private drawDisplay(display: Display) {
@@ -100,15 +106,19 @@ export class View {
         const orientation = display.orientation
         const scale = display.scale
 
+        let object: Object3D
+
         if (display instanceof CompositeImpl) {
-            this.drawComposite(display)
+            object = this.drawComposite(display)
         } else if (display instanceof Primitive) {
-            this.drawPrimitive(display)
+            object = this.drawPrimitive(display)
         } else if (display instanceof ImageImpl) {
-            this.drawImage(display)
+            object = this.drawImage(display)
         } else {
             throw "Display type not supported!"
         }
+
+        return object
     }
     private drawComponent(component: Component<any, any>) {
         const position = component.outputs.position as Vector
@@ -116,14 +126,18 @@ export class View {
         const scale = component.outputs.scale as Vector
         const display = component.outputs.display as Display
 
-        this.drawDisplay(display)
+        const object = this.drawDisplay(display)
+
+        return object
     }
     private drawModel() {
+        const group = new Group()
         for (const c of this.model.staticComponents) {
-            this.drawComponent(c)
+            group.add(this.drawComponent(c))
         }
         for (const c of this.model.dynamicComponents) {
-            this.drawComponent(c)
+            group.add(this.drawComponent(c))
         }
+        return group
     }
 }
