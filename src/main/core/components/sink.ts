@@ -27,5 +27,7 @@ export class Sink extends FlowComponent<SinkI, SinkO> {
     protected override recieveComponent(component: Component<any, any>) {
         this._outputs.object = component
         this._outputs.count += 1
+
+        this.model.removeDynamicComponent(component)
     }
 }

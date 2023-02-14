@@ -37,6 +37,9 @@ export class Model {
     addDynamicComponent(component: Component<any, any>) {
         this.dynamicComponents.push(component)
     }
+    removeDynamicComponent(component: Component<any, any>) {
+        this.dynamicComponents.splice(this.dynamicComponents.indexOf(component), 1)
+    }
 
     private searchBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
         let lower = 0
@@ -63,8 +66,24 @@ export class Model {
         }
     }
     private insertBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
-        const index = this.searchBinary(array, comparator, value)
-        array.splice(index, 0, value)
+        if (array.length == 0) {
+            array.push(value)
+        } else {
+            const index = this.searchBinary(array, comparator, value)
+            if (comparator(array[index], value) > 0) {
+                array.splice(index, 0, value)
+            } else {
+                array.splice(index + 1, 0, value)
+            }
+        }
+    }
+    private removeBinary<T>(array: T[], comparator: (a: T, b: T) => number, value: T) {
+        if (array.length > 0) {
+            const index = this.searchBinary(array, comparator, value)
+            if (array[index] == value) {
+                array.splice(index, 1)
+            }
+        }
     }
 
     scheduleUpdate(time: number, component: Component<any, any>) {
@@ -228,6 +247,8 @@ export class Model {
     private step() {
         // Take next event
         const event = this.events.shift()
+        // Remove update
+        this.removeBinary(this.updates.get(event.component), (a, b) => a - b, event.time)
         
         // Update clock
         this.time = event.time

@@ -52,10 +52,13 @@ export class Server extends Component<ServerI, ServerO> {
     
             if (queue.outputs.length > 0) {
                 const time = this.model.time + this.inputs.serviceTime
+                const object = queue.takeComponent()
 
-                this._outputs.object = queue.takeComponent()
+                this._outputs.object = object
                 this._outputs.departureTime = time
                 this._outputs.count += 1
+
+                object.move(this.outputs.position)
     
                 this.model.scheduleUpdate(time, this)
             }

@@ -1,4 +1,5 @@
 import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
 export class View {
@@ -6,6 +7,7 @@ export class View {
 
     private renderer: WebGLRenderer
     private camera: PerspectiveCamera
+    private controls: OrbitControls
     private ambient: AmbientLight
     private directional: DirectionalLight
     private scene: Scene
@@ -21,10 +23,12 @@ export class View {
         this.renderer.setPixelRatio(window.devicePixelRatio)
 
         this.camera = new PerspectiveCamera()
-        this.camera.position.x = 5
-        this.camera.position.y = 5
-        this.camera.position.z = 5
+        this.camera.position.x = 0
+        this.camera.position.y = 40
+        this.camera.position.z = 20
         this.camera.lookAt(new Vector3(0, 0, 0))
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 
         this.ambient = new AmbientLight(0xffffff, 0.5)
 
@@ -118,6 +122,10 @@ export class View {
             throw "Display type not supported!"
         }
 
+        object.position.x = position[0]
+        object.position.y = position[1]
+        object.position.z = position[2]
+
         return object
     }
     private drawComponent(component: Component<any, any>) {
@@ -127,6 +135,10 @@ export class View {
         const display = component.outputs.display as Display
 
         const object = this.drawDisplay(display)
+
+        object.position.x = position[0]
+        object.position.y = position[1]
+        object.position.z = position[2]
 
         return object
     }

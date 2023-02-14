@@ -1,33 +1,38 @@
-import { Branch, Entity, Queue, Server, Sink, Source } from "../main/index"
+import { Box, Branch, Entity, Queue, Server, Sink, Source } from "../main/index"
 
 export function simple() {
     const source = new Source()
-    const queue = new Queue()
+    const queue1 = new Queue()
     const server = new Server()
     const branch = new Branch()
+    const queue2 = new Queue()
     const sink = new Sink()
     
     source.inputs = {
         name: "Source",
+        position: [-4, 0, 0],
         factory() {
             return new Entity({
-                name: `Entity_${source.outputs.count}`
+                name: `Entity_${source.outputs.count}`,
+                display: Box(1.5, 1.5, 1.5, "red")
             })
         },
         get count() {
-            return Math.random() * 10
+            return 1
         },
         get interArrivalTime() {
-            return Math.random() * 2000
+            return Math.random() * 1000
         },
-        next: queue
+        next: queue1
     }
-    queue.inputs = {
-        name: "Queue"
+    queue1.inputs = {
+        name: "Queue 1",
+        position: [-2, 0, 0]
     }
     server.inputs = {
         name: "Server",
-        queue: queue,
+        position: [0, 0, 0],
+        queue: queue1,
         get serviceTime() {
             return Math.random() * 3000
         },
@@ -35,12 +40,18 @@ export function simple() {
     }
     branch.inputs = {
         name: "Branch",
-        next: [sink],
+        position: [2, 0, 0],
+        next: [queue2, sink],
         choice: 0
     }
+    queue2.inputs = {
+        name: "Queue 2",
+        position: [4, 0, 1],
+    }
     sink.inputs = {
-        name: "Sink"
+        name: "Sink",
+        position: [4, 0, -1]
     }
 
-    return { source, queue, server, branch, sink }
+    return { source, queue: queue1, server, branch, sink }
 }
