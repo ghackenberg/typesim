@@ -1,6 +1,6 @@
-import { Branch, Entity, Model, Queue, Server, Sink, Source } from '../main/index.js'
+import { Branch, Entity, Queue, Server, Sink, Source } from "../main/index"
 
-function simple() {
+export function simple() {
     const source = new Source()
     const queue = new Queue()
     const server = new Server()
@@ -44,36 +44,3 @@ function simple() {
 
     return { source, queue, server, branch, sink }
 }
-
-async function run() {
-    console.debug = () => {}
-
-    const model = new Model()
-    const { source, queue, sink } = simple()
-
-    console.log("Run 1")
-
-    await model.simulate(10000)
-    
-    console.log("Source.count", source.outputs.count)
-    console.log("Queue.length", queue.outputs.length)
-    console.log("Sink.count", sink.outputs.count)
-
-    console.log("Run 2")
-    
-    await model.simulate(10000, 2)
-    
-    console.log("Source.count", source.outputs.count)
-    console.log("Queue.length", queue.outputs.length)
-    console.log("Sink.count", sink.outputs.count)
-
-    console.log("Run 3")
-    
-    await model.simulate(10000, 1)
-    
-    console.log("Source.count", source.outputs.count)
-    console.log("Queue.length", queue.outputs.length)
-    console.log("Sink.count", sink.outputs.count)
-}
-
-run()

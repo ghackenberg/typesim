@@ -32,7 +32,7 @@
     },
     "scripts": {
         "clean": "rimraf bin && rimraf dts",
-        "build": "tsc",
+        "build": "tsc && webpack",
         "test": "npm run clean && npm run build && npm run test-all",
         "test-all": "npm run test-simple && npm run test-expression",
         "test-simple": "node bin/test/simple.js",
@@ -40,11 +40,16 @@
         "deploy": "npm run clean && npm run build && npm publish"
     },
     "devDependencies": {
-        "@types/p5": "^1.5.0",
+        "@types/node": "^18.13.0",
+        "@types/three": "^0.149.0",
         "rimraf": "^4.1.2",
-        "typescript": "^4.9.5"
+        "ts-loader": "^9.4.2",
+        "typescript": "^4.9.5",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.1",
+        "webpack-dev-server": "^4.11.1"
     },
     "dependencies": {
-        "p5": "^1.5.0"
+        "three": "^0.149.0"
     }
 }

@@ -1,26 +1,49 @@
-import * as P5 from "p5"
+import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
 export class Canvas {
-    private p: P5
+    public element: HTMLCanvasElement
 
-    constructor(private model: Model) {
-        this.p = new P5((p: P5) => {
-            p.preload = () => {
-                // empty
-            }
-            p.setup = () => {
-                p.createCanvas(100, 100, p.WEBGL)
-            }
-            p.draw = () => {
-                p.background(255)
-                this.drawModel()
-            }
+    private renderer: WebGLRenderer
+    private scene: Scene
+    private camera: PerspectiveCamera
+
+    constructor(private model: Model, canvas: HTMLCanvasElement = undefined) {
+        this.renderer = new WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            logarithmicDepthBuffer: true
         })
+        this.renderer.setPixelRatio(window.devicePixelRatio)
+
+        this.camera = new PerspectiveCamera()
+
+        this.scene = new Scene()
+
+        this.element = this.renderer.domElement
+        this.element.addEventListener("resize", () => {
+            this.resize()
+            this.render()
+        })
+
+        this.resize()
+    }
+
+    private resize() {
+        const width = this.element.offsetWidth
+        const height = this.element.offsetHeight
+
+        this.renderer.setSize(width, height)
+
+        const aspect = width / height
+
+        this.camera.aspect = aspect
+        this.camera.updateProjectionMatrix()
     }
     
     render() {
-        this.p.redraw()
+        this.renderer.render(this.scene, this.camera)
     }
 
     private drawComposite(display: CompositeImpl) {
@@ -29,19 +52,15 @@ export class Canvas {
         }
     }
     private drawBox(display: BoxImpl) {
-        this.p.box(display.width, display.height, display.length)
+
     }
     private drawSphere(display: SphereImpl) {
-        this.p.sphere(display.radius)
+
     }
     private drawCylinder(display: CylinderImpl) {
-        this.p.cylinder(display.radius, display.height)
+
     }
     private drawPrimitive(display: Primitive) {
-        this.p.push()
-
-        this.p.color(display.color)
-
         if (display instanceof BoxImpl) {
             this.drawBox(display)
         } else if (display instanceof SphereImpl) {
@@ -51,8 +70,6 @@ export class Canvas {
         } else {
             throw "Primitive type not supported!"
         }
-
-        this.p.pop()
     }
     private drawImage(display: ImageImpl) {
         throw "Image not implemented yet!"
@@ -61,16 +78,6 @@ export class Canvas {
         const position = display.position
         const orientation = display.orientation
         const scale = display.scale
-        
-        this.p.push()
-        
-        this.p.translate(position[0], position[1], position[2])
-        
-        this.p.rotateX(orientation[0])
-        this.p.rotateY(orientation[1])
-        this.p.rotateZ(orientation[2])
-        
-        this.p.scale(scale[0], scale[1], scale[2])
 
         if (display instanceof CompositeImpl) {
             this.drawComposite(display)
@@ -81,28 +88,14 @@ export class Canvas {
         } else {
             throw "Display type not supported!"
         }
-
-        this.p.pop()
     }
     private drawComponent(component: Component<any, any>) {
         const position = component.outputs.position as Vector
         const orientation = component.outputs.orientation as Vector
         const scale = component.outputs.scale as Vector
         const display = component.outputs.display as Display
-        
-        this.p.push()
-        
-        this.p.translate(position[0], position[1], position[2])
-        
-        this.p.rotateX(orientation[0])
-        this.p.rotateY(orientation[1])
-        this.p.rotateZ(orientation[2])
-        
-        this.p.scale(scale[0], scale[1], scale[2])
 
         this.drawDisplay(display)
-
-        this.p.pop()
     }
     private drawModel() {
         for (const c of this.model.staticComponents) {
