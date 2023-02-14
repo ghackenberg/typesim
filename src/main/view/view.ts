@@ -1,4 +1,4 @@
-import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
+import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PerspectiveCamera, Plane, PlaneGeometry, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
@@ -20,6 +20,7 @@ export class View {
             antialias: true,
             logarithmicDepthBuffer: true
         })
+        this.renderer.shadowMap.enabled = true
         this.renderer.setPixelRatio(window.devicePixelRatio)
 
         this.camera = new PerspectiveCamera()
@@ -33,16 +34,29 @@ export class View {
         this.ambient = new AmbientLight(0xffffff, 0.5)
 
         this.directional = new DirectionalLight(0xffffff, 1)
-        this.directional.position.x = 5
-        this.directional.position.y = 2.5
-        this.directional.position.z = 0
+        this.directional.castShadow = true
+        this.directional.shadow.mapSize.width = 2048
+        this.directional.shadow.mapSize.height = 2048
+        this.directional.position.x = 25
+        this.directional.position.y = 100
+        this.directional.position.z = 50
 
         this.group = new Group()
+
+        const geometry = new PlaneGeometry(100, 100)
+        const material = new MeshPhongMaterial({ color: "gray" })
+        const mesh = new Mesh(geometry, material)
+        mesh.castShadow = false
+        mesh.receiveShadow = true
+
+        mesh.translateY(-0.75)
+        mesh.rotateX(-Math.PI / 2)
 
         this.scene = new Scene()
         this.scene.add(this.ambient)
         this.scene.add(this.directional)
         this.scene.add(this.group)
+        this.scene.add(mesh)
 
         this.canvas = this.renderer.domElement
 
@@ -100,7 +114,10 @@ export class View {
         } else {
             throw "Primitive type not supported!"
         }
-        return new Mesh(geometry, material)
+        const mesh = new Mesh(geometry, material)
+        mesh.castShadow = true
+        mesh.receiveShadow = true
+        return mesh
     }
     private drawImage(display: ImageImpl): Object3D {
         throw "Image not implemented yet!"
