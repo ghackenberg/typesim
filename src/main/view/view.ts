@@ -1,4 +1,4 @@
-import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, Group, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PerspectiveCamera, Plane, PlaneGeometry, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
+import { AmbientLight, BoxGeometry, BufferGeometry, CylinderGeometry, DirectionalLight, GridHelper, Group, Mesh, MeshPhongMaterial, Object3D, PerspectiveCamera, Scene, SphereGeometry, Vector3, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { BoxImpl, Component, CompositeImpl, CylinderImpl, Display, ImageImpl, Model, Primitive, SphereImpl, Vector } from "../index.js"
 
@@ -7,7 +7,6 @@ export class View {
 
     private renderer: WebGLRenderer
     private camera: PerspectiveCamera
-    private controls: OrbitControls
     private ambient: AmbientLight
     private directional: DirectionalLight
     private scene: Scene
@@ -20,58 +19,40 @@ export class View {
             antialias: true,
             logarithmicDepthBuffer: true
         })
-        this.renderer.shadowMap.enabled = true
         this.renderer.setPixelRatio(window.devicePixelRatio)
 
         this.camera = new PerspectiveCamera()
-        this.camera.position.x = 0
-        this.camera.position.y = 40
-        this.camera.position.z = 20
+        this.camera.position.x = 50
+        this.camera.position.y = 100
+        this.camera.position.z = 100
         this.camera.lookAt(new Vector3(0, 0, 0))
 
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+        new OrbitControls(this.camera, this.renderer.domElement)
 
         this.ambient = new AmbientLight(0xffffff, 0.5)
 
         this.directional = new DirectionalLight(0xffffff, 1)
-        this.directional.castShadow = true
-        this.directional.shadow.mapSize.width = 2048
-        this.directional.shadow.mapSize.height = 2048
         this.directional.position.x = 25
         this.directional.position.y = 100
         this.directional.position.z = 50
 
         this.group = new Group()
 
-        const geometry = new PlaneGeometry(100, 100)
-        const material = new MeshPhongMaterial({ color: "gray" })
-        const mesh = new Mesh(geometry, material)
-        mesh.castShadow = false
-        mesh.receiveShadow = true
-
-        mesh.translateY(-0.75)
-        mesh.rotateX(-Math.PI / 2)
+        const grid = new GridHelper(100, 10)
 
         this.scene = new Scene()
         this.scene.add(this.ambient)
         this.scene.add(this.directional)
         this.scene.add(this.group)
-        this.scene.add(mesh)
+        this.scene.add(grid)
 
         this.canvas = this.renderer.domElement
 
         window.addEventListener("resize", () => {
             this.resize()
-            this.render()
         })
-
+        
         this.resize()
-    }
-    
-    render() {
-        this.group.clear()
-        this.group.add(this.drawModel())
-        this.renderer.render(this.scene, this.camera)
     }
 
     private resize() {
@@ -84,6 +65,19 @@ export class View {
 
         this.camera.aspect = aspect
         this.camera.updateProjectionMatrix()
+
+        this.render()
+    }
+    
+    private render() {
+        requestAnimationFrame(this.render.bind(this))
+
+        if (this.model.simulation) {
+            this.group.clear()
+            this.group.add(this.drawModel())
+        }
+
+        this.renderer.render(this.scene, this.camera)
     }
 
     private drawComposite(display: CompositeImpl) {
@@ -114,10 +108,7 @@ export class View {
         } else {
             throw "Primitive type not supported!"
         }
-        const mesh = new Mesh(geometry, material)
-        mesh.castShadow = true
-        mesh.receiveShadow = true
-        return mesh
+        return new Mesh(geometry, material)
     }
     private drawImage(display: ImageImpl): Object3D {
         throw "Image not implemented yet!"

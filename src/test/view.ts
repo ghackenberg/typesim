@@ -10,8 +10,8 @@ canvas.style.position = "absolute"
 canvas.style.top = "0"
 canvas.style.left = "0"
 
-const view = new View(model, canvas)
+new View(model, canvas)
 
 document.body.appendChild(canvas)
 
-model.simulate(10000, 1, () => view.render())
+model.simulate(10000, 1)

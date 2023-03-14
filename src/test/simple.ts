@@ -10,7 +10,7 @@ export function simple() {
     
     source.inputs = {
         name: "Source",
-        position: [-4, 0, 0],
+        position: [-20, 0, 0],
         factory() {
             return new Entity({
                 name: `Entity_${source.outputs.count}`,
@@ -27,7 +27,7 @@ export function simple() {
     }
     queue1.inputs = {
         name: "Queue 1",
-        position: [-2, 0, 0]
+        position: [-10, 0, 0]
     }
     server.inputs = {
         name: "Server",
@@ -40,17 +40,17 @@ export function simple() {
     }
     branch.inputs = {
         name: "Branch",
-        position: [2, 0, 0],
+        position: [10, 0, 0],
         next: [queue2, sink],
         choice: 0
     }
     queue2.inputs = {
         name: "Queue 2",
-        position: [4, 0, 1],
+        position: [20, 0, 10],
     }
     sink.inputs = {
         name: "Sink",
-        position: [4, 0, -1]
+        position: [20, 0, -10]
     }
 
     return { source, queue: queue1, server, branch, sink }

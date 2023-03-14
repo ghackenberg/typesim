@@ -23,9 +23,6 @@ export class Model {
     private _simulation: boolean = false
     private _visualization: boolean = false
 
-    private callback: () => void
-    private frame: number
-
     constructor() {
         Model._INSTANCES.push(this)
         Model._INSTANCE = this
@@ -121,13 +118,10 @@ export class Model {
         this._visualization = value
     }
     
-    async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE, callback: () => void = undefined) {
+    async simulate(until = Number.MAX_VALUE, factor = Number.MAX_VALUE) {
         if (this.simulation) {
             throw "Simulation already running!"
         }
-
-        this.callback = callback
-        this.frame = 0
 
         // Check all components
         let issues: string[] = []
@@ -148,17 +142,11 @@ export class Model {
         this.events = []
         this.time = 0
         this.simulation = true
-        this.visualization = !!callback
         
         // Reset all static components
         console.debug("Simulation reset")
         for (const component of this.staticComponents) {
             component.reset()
-        }
-        // Initial render
-        if (this.visualization) {
-            console.debug("Simulation render")
-            this.render()
         }
 
         // Execute loop
@@ -194,9 +182,6 @@ export class Model {
             console.debug('Time:', this.time)
             console.debug()
         }
-        if (this.visualization) {
-            this.render()
-        }
     }
 
     private async loopAsync(until: number, factor: number) {
@@ -215,9 +200,6 @@ export class Model {
                                 this.step()
                             } else {
                                 this.time = deltaReal * factor + startSim
-                                if (this.visualization) {
-                                    this.render()
-                                }
                                 setTimeout(next, Math.min(deltaSim - deltaReal, 1000 / 30))
                                 return
                             }
@@ -231,9 +213,6 @@ export class Model {
                         
                         console.debug('Time:', this.time)
                         console.debug()
-                    }
-                    if (this.visualization) {
-                        this.render()
                     }
                     resolve()
                 } catch(error) {
@@ -259,19 +238,6 @@ export class Model {
         // Update component
         event.component.update()
         console.debug()
-    }
-
-    private render() {
-        if (this.frame == 0) {
-            if (typeof window == "undefined") {
-                this.callback()
-            } else {
-                this.frame = requestAnimationFrame(() => {
-                    this.callback()
-                    this.frame = 0
-                })
-            }
-        }
     }
     
 }
